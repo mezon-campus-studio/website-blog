@@ -1,0 +1,312 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #ffffff;
+  color: #0f172a;
+  font-family: Arial, sans-serif;
+  transition: 0.3s;
+}
+
+body.dark {
+  background: #0f172a;
+  color: #f1f5f9;
+}
+
+/* Global container */
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Thanh tìm kiếm */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+body.dark .navbar {
+  border-color: #334155;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.nav-links {
+  display: flex;
+  gap: 16px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: inherit;
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.nav-links a:hover {
+  background: #f1f5f9;
+}
+
+body.dark .nav-links a:hover {
+  background: #1e293b;
+}
+
+.nav-links .active {
+  color: #2563eb;
+  font-weight: bold;
+}
+
+/* Thanh điều hướng*/
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hộp tìm kiếm */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 140px;
+}
+
+body.dark .search-box {
+  background: #1e293b;
+}
+
+/* Theme box */
+.theme-btn {
+  border: none;
+  background: #f1f5f9;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+body.dark .theme-btn {
+  background: #1e293b;
+  color: white;
+}
+
+/* Auth box */
+.auth {
+  display: flex;
+  gap: 8px;
+}
+
+.login-btn,
+.signup-btn {
+  padding: 6px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  border: 1px solid transparent;
+}
+
+.login-btn {
+  border: 1px solid #cbd5e1;
+}
+
+.signup-btn {
+  background: #2563eb;
+  color: white;
+}
+
+/* Rec */
+.rec {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  padding: 50px 0;
+  align-items: center;
+}
+
+.rec-left .tag {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.rec-left h2 {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.rec-left .desc {
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  display: inline-block;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: white;
+  border-radius: 10px;
+  text-decoration: none;
+}
+
+.rec-right {
+  height: 320px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+}
+
+/* Báo */
+.articles {
+  padding: 40px 0;
+}
+
+.articles h3 {
+  margin-bottom: 20px;
+}
+
+/* Grid responsive */
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: 0.2s;
+  border: 1px solid transparent;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: #cbd5e1;
+}
+
+body.dark .card {
+  background: #1e293b;
+}
+
+.card-img {
+  height: 140px;
+  background: #cbd5e1;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.author img {
+  border-radius: 50%;
+}
+
+/* Subscribe */
+.subscribe {
+  padding: 50px 0;
+}
+
+.subscribe-box {
+  background: #f1f5f9;
+  padding: 30px;
+  border-radius: 16px;
+}
+
+body.dark .subscribe-box {
+  background: #1e293b;
+}
+
+.subscribe-input {
+  display: flex;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+.subscribe-input input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+}
+
+.subscribe-input button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+}
+
+/* Footer */
+.footer {
+  margin-top: 40px;
+  padding: 40px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+body.dark .footer {
+  border-color: #334155;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.footer ul {
+  list-style: none;
+  margin-top: 10px;
+}
+
+.footer li {
+  margin-bottom: 6px;
+}
+
+.footer a {
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.8;
+}
+
+.icons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Wrap */
+.box {
+  padding: 10px;
+}

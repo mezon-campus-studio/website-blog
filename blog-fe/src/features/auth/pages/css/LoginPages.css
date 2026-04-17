@@ -1,0 +1,167 @@
+/* LoginPage.css */
+.login-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #0a0a0a;
+  color: white;
+  font-family: sans-serif;
+}
+
+/* Cột trái - Brand */
+.login-brand {
+  display: none; /* Ẩn trên mobile */
+  width: 50%;
+  background-color: #1d4ed8; /* blue-700 */
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .login-brand { display: flex; }
+}
+
+.brand-title {
+  font-size: 3rem;
+  font-weight: 900;
+  font-style: italic;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 10;
+}
+
+.brand-text {
+  font-size: 1.25rem;
+  opacity: 0.8;
+  line-height: 1.6;
+  max-width: 400px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Cột phải - Form */
+.login-form-section {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+@media (min-width: 768px) {
+  .login-form-section { width: 50%; }
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-header h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.form-header p {
+  color: #64748b; /* slate-500 */
+  margin-bottom: 32px;
+}
+
+/* Input Styles */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.input-field {
+  width: 100%;
+  background-color: #111;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0;
+}
+
+.password-toggle-btn:hover {
+  color: #60a5fa;
+}
+
+.password-with-toggle {
+  padding-right: 76px;
+}
+
+.input-field:focus {
+  border-color: #2563eb;
+}
+
+/* Buttons */
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
+}
+
+.btn-login:hover {
+  background-color: #1d4ed8;
+}
+
+.social-group {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.btn-social {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  padding: 10px;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
