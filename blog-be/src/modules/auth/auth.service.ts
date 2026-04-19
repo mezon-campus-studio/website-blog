@@ -11,8 +11,11 @@ export class AuthService {
    ) { }
 
    async register(body: SignUpDto) {
-      this.logger.info("Registering user in service");
-      const { name, email, password } = body;
+      const { name, email, password, confirmPassword } = body;
+
+      if (password !== confirmPassword) {
+         throw new UnauthorizedException("Passwords do not match");
+      }
 
       const existingUser = await this.authRepository.findUserByEmail(email);
 
@@ -30,24 +33,18 @@ export class AuthService {
 
       return newUser;
    }
+
    async login(body: SignInDto) {
-      this.logger.info("Logging in user in service");
       const { email, password } = body;
 
       const user = await this.authRepository.findUserByEmail(email);
 
-      if (!user) {
+      if (!user || !(await bcrypt.compare(password, user.password))) {
          throw new UnauthorizedException("Invalid email or password");
       }
 
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-
-      if (!isPasswordValid) {
-         throw new UnauthorizedException("Invalid email or password");
-      }
-
-      return user;
-   };
+      return this.authRepository.updateLastLogin(user.id, new Date());
+   }
 }
 
 

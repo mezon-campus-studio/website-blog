@@ -2,7 +2,18 @@ import { UnauthorizedException } from "@/common/utils/app-error";
 import passport from "passport";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
 import { Env } from "./env.config";
-import { findByIdUserService } from "@/services/user.service";
+import prisma from "@/lib/prisma";
+import { UserService } from "@/modules/user/user.service";
+import { PrismaUserRepository } from "@/modules/user/prisma-user.repository";
+import { createLogger, format, transports } from "winston";
+
+const logger = createLogger({
+   format: format.combine(format.timestamp(), format.json()),
+   transports: [new transports.Console()],
+});
+
+const userRepository = new PrismaUserRepository(prisma, logger);
+const userService = new UserService(userRepository, logger);
 
 
 passport.use(
@@ -20,15 +31,15 @@ passport.use(
    },
       async ({ userId }, done) => {
          try {
-            const user = userId && (await findByIdUserService(userId));
+            const user = userId && (await userService.findUserById(userId));
 
             if (!user) {
-               return done(null, false);
+               throw new UnauthorizedException("Unauthorized: User not found");
             }
 
             return done(null, user);
          } catch (error) {
-            return done(null, false);
+            return done(error, false);
          }
       }
    )

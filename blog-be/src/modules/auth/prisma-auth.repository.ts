@@ -1,6 +1,5 @@
 import { PrismaClient, User } from "@prisma/client";
-import { IAuthRepository } from "./auth.repository";
-import { SignUpDto } from "./dto/signup.dto";
+import { CreateUserData, IAuthRepository } from "./auth.repository";
 import { Logger } from "winston";
 
 export class PrismaAuthRepository implements IAuthRepository {
@@ -13,14 +12,31 @@ export class PrismaAuthRepository implements IAuthRepository {
     async findUserByEmail(email: string): Promise<User | null> {
         return this.prisma.user.findUnique({
             where: {
-                email, isDeleted: false,
+                email,
+                isDeleted: false,
                 isActive: true,
             }
         });
     }
 
-    async createUser(data: SignUpDto): Promise<User> {
+    async updateLastLogin(userId: string, lastLoginAt: Date): Promise<User> {
+        return this.prisma.user.update({
+            where: { id: userId },
+            data: { lastLoginAt },
+        });
+    }
+
+    async createUser(data: CreateUserData): Promise<User> {
         this.logger.info("Creating user in repository", data);
-        return this.prisma.user.create({ data: { name: data.name, email: data.email, password: data.password } });
+        return this.prisma.user.create({
+            data: {
+                name: data.name,
+                email: data.email,
+                password: data.password,
+                createdAt: new Date(),
+                createdBy: data.name,
+                lastLoginAt: new Date()
+            }
+        });
     }
 }

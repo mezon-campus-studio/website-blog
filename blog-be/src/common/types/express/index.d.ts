@@ -1,13 +1,17 @@
+import type { ROLE } from "@prisma/client";
+
 declare global {
   namespace Express {
+    interface User {
+      id: string;
+      email: string;
+      role: ROLE;
+    }
+
     interface Request {
-      user?: {
-        id: number;
-        email: string;
-        role?: string;
-      };
+      file?: Multer.File;
     }
   }
 }
 
-export {};
+export { };
