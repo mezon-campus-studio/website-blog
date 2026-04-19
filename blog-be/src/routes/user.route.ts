@@ -27,6 +27,7 @@ const userService = new UserService(useRepository, logger);
 const userController = new UserController(userService);
 
 userRouter.use(passportAuthenticateJwt);
+
 userRouter.get(
    "/profile/:userId",
    userController.getProfile.bind(userController)
