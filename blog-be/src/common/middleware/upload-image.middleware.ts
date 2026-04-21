@@ -13,7 +13,7 @@ const fileFilter: multer.Options["fileFilter"] = (_req, file, cb) => {
    cb(null, true);
 };
 
-export const uploadAvatar = multer({
+export const uploadImage = multer({
    storage,
    fileFilter,
    limits: { fileSize: 5 * 1024 * 1024 },  

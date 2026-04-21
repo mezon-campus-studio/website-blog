@@ -10,7 +10,7 @@ import { ChangePasswordDto } from "@/modules/user/dto/change-password.dto";
 import { Router } from "express";
 import { loggers, format, transports, Logger } from "winston";
 import { asyncHandler } from "@/common/middleware/async-handler.middleware";
-import { uploadAvatar } from "@/common/middleware/upload-avatar.middleware";
+import { uploadImage } from "@/common/middleware/upload-image.middleware";
 
 
 loggers.add("user", {
@@ -50,7 +50,7 @@ userRouter.patch(
 
 userRouter.post(
    "/profile/avatar",
-   uploadAvatar.single("avatar"),
+   uploadImage.single("avatar"),
    asyncHandler(userController.uploadAvatar.bind(userController))
 );
 
