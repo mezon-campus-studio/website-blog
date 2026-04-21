@@ -12,6 +12,7 @@ export class UserController {
 
    async getAllUsers(req: Request, res: Response) {
       const users = await this.userService.getAllUsers();
+
       return res.status(HTTPSTATUS.OK).json({
          message: "Get users successfully",
          users,
@@ -20,6 +21,12 @@ export class UserController {
 
    async getProfile(req: Request, res: Response) {
       const { userId } = req.params as { userId: string };
+
+      if (!userId) {
+         return res.status(HTTPSTATUS.BAD_REQUEST).json({
+            message: "Missing userId parameter",
+         });
+      }
       const profile = await this.userService.getProfile(userId);
 
       return res.status(HTTPSTATUS.OK).json({
@@ -30,6 +37,13 @@ export class UserController {
 
    async updateProfile(req: Request, res: Response) {
       const userId = req.user?.id;
+
+      if (!userId) {
+         return res.status(HTTPSTATUS.BAD_REQUEST).json({
+            message: "Missing authenticated user",
+         });
+      }
+
       const dto = req.body as UpdateProfileDto;
       const profile = await this.userService.updateProfile(userId, dto);
 
@@ -41,7 +55,14 @@ export class UserController {
 
    async uploadAvatar(req: Request, res: Response) {
       const userId = req.user?.id;
-      const profile = await this.userService.updateAvatar(userId, req.file?.path);
+
+      if (!userId) {
+         return res.status(HTTPSTATUS.BAD_REQUEST).json({
+            message: "Missing authenticated user",
+         });
+      }
+
+      const profile = await this.userService.updateAvatar(userId, req.file);
 
       return res.status(HTTPSTATUS.OK).json({
          message: "Upload avatar successfully",
@@ -51,6 +72,13 @@ export class UserController {
 
    async changePassword(req: Request, res: Response) {
       const userId = req.user?.id;
+
+      if (!userId) {
+         return res.status(HTTPSTATUS.BAD_REQUEST).json({
+            message: "Missing authenticated user",
+         });
+      }
+
       const dto = req.body as ChangePasswordDto;
       await this.userService.changePassword(userId, dto);
 
@@ -66,7 +94,14 @@ export class UserController {
 
    async updateStatus(req: Request, res: Response) {
       const { userId } = req.params as { userId: string };
+
       const currentUserId = req.user?.id;
+
+      if (!currentUserId) {
+         return res.status(HTTPSTATUS.BAD_REQUEST).json({
+            message: "Missing authenticated user",
+         });
+      }
 
       await this.userService.updateStatus(userId, currentUserId);
 

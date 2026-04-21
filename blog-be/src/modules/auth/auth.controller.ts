@@ -61,11 +61,4 @@ export class AuthController {
 
 }
 
-  async authStatus(req: Request, res: Response) {
-    const user = req.user;
-    return res.status(HTTPSTATUS.OK).json({
-      message: 'User authenticated successfully',
-      user,
-    });
-  }
-}
+ 
