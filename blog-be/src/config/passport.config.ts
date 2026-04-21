@@ -17,19 +17,19 @@ const userService = new UserService(userRepository, logger);
 
 
 passport.use(
-  new JwtStrategy(
-    {
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (req) => {
-          const token = req.cookies.accessToken;
-          if (!token) throw new UnauthorizedException('Unauthorized: No token provided');
-          return token;
-        },
-      ]),
-      secretOrKey: Env.JWT_SECRET,
-      audience: ["user"],
-      algorithms: ["HS256"],
-   },
+   new JwtStrategy(
+      {
+         jwtFromRequest: ExtractJwt.fromExtractors([
+            (req) => {
+               const token = req.cookies.accessToken;
+               if (!token) throw new UnauthorizedException('Unauthorized: No token provided');
+               return token;
+            },
+         ]),
+         secretOrKey: Env.JWT_SECRET,
+         audience: ["user"],
+         algorithms: ["HS256"],
+      },
       async ({ userId }, done) => {
          try {
             const user = userId && (await userService.findUserById(userId));
@@ -43,7 +43,7 @@ passport.use(
             return done(error, false);
          }
       }
-    },
-  ),
+
+   ),
 );
 export const passportAuthenticateJwt = passport.authenticate('jwt', { session: false });
