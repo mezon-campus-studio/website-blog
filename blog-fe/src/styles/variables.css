@@ -1,0 +1,37 @@
+:root {
+  /* Core */
+  --color-primary: #123bb6;
+  --color-primary-hover: #0e2d8a;
+
+  /* Featured + Categories */
+  --color-primary-soft: rgba(18, 59, 182, 0.08);
+  --color-primary-border: rgba(18, 59, 182, 0.2);
+
+  /* /* Background */
+  --color-bg-main: #ffffff;
+  --color-bg-soft: #f9fafb;
+  --color-bg-input: #f1f5f9;
+
+  /* Text */
+  --color-text-title: #111827;
+  --color-text-body: #4b5563;
+  --color-text-meta: #6b7280;
+
+  /* Border */
+  --color-border: #e5e7eb;
+
+  /* Status*/
+  --color-status-ok: #10b981;
+  --color-status-ok-bg: rgba(16, 185, 129, 0.15);
+
+  /* typography */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Layout */
+  --container-max: 1120px;
+
+  /* Radius */
+  --radius-full: 9999px;
+  --radius-lg: 24px;
+}

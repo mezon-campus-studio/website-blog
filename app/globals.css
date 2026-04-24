@@ -1,0 +1,33 @@
+:root {
+  /* Colors */
+  --color-bg: #ffffff;
+  --color-text: #111111;
+  --color-primary: #2563eb;
+  --color-border: #e5e7eb;
+  --color-muted: #f3f4f6;
+
+  /* Dark Mode Tokens */
+  --color-bg-dark: #0f172a;
+  --color-text-dark: #f9fafb;
+  --color-border-dark: #1f2937;
+  --color-muted-dark: #111827;
+
+  /* Typography */
+  --font-family-sans: system-ui, -apple-system, sans-serif;
+  --font-family-serif: "Georgia", serif;
+
+  /* Spacing */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+
+  /* Radius */
+  --radius-md: 6px;
+}
+
+[data-theme="dark"] {
+  --color-bg: var(--color-bg-dark);
+  --color-text: var(--color-text-dark);
+  --color-border: var(--color-border-dark);
+  --color-muted: var(--color-muted-dark);
+}

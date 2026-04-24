@@ -1,0 +1,116 @@
+/* src/features/home/components/NewsLetter.module.css */
+.container {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: var(--radius-lg);
+  padding: 64px 48px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px; 
+  align-items: center;
+  margin-bottom: 80px;
+}
+
+/* Typography for Newsletter */
+.title {
+  font-family: var(--font-serif);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--color-text-title);
+  margin: 0 0 16px 0;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.description {
+  font-family: var(--font-sans);
+  font-size: 1.125rem;
+  color: var(--color-text-body);
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+}
+
+/* Form Elements */
+.formGroup {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.input {
+  flex: 1;
+  padding: 14px 24px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.disclaimer {
+  font-size: 13px;
+  color: var(--color-text-meta);
+}
+
+.illustrationWrapper {
+  display: flex;
+  justify-content: center; 
+}
+
+.illustrationCard {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 32px; 
+  box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+  transform: rotate(-3deg);
+  width: 100%;
+  max-width: 400px;
+}
+
+.mockHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mockIcon {
+  width: 48px;
+  height: 48px;
+  background-color: #e0e7ff;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.mockTitle {
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--color-text-title);
+  margin-bottom: 4px;
+}
+
+.mockSub {
+  font-size: 13px;
+  color: var(--color-text-meta);
+}
+
+/* Decorative skeleton lines */
+.mockLine1, .mockLine2, .mockLine3 {
+  height: 10px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.mockLine1 { width: 100%; }
+.mockLine2 { width: 85%; }
+.mockLine3 { width: 60%; margin-bottom: 0; }

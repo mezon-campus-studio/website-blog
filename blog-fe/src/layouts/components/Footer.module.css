@@ -1,0 +1,82 @@
+.footer {
+  background-color: var(--color-bg-main);
+  border-top: 1px solid var(--color-border);
+  padding: 80px 48px 24px;
+  margin-top: 80px;
+}
+
+.top {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 80px;
+  margin-bottom: 60px;
+}
+
+.brandDesc {
+  color: var(--color-text-meta);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 20px 0;
+}
+
+.socials {
+  display: flex;
+  gap: 16px;
+}
+
+.socialIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-title);
+}
+
+.colTitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.link {
+  color: var(--color-text-meta);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.bottomBar {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-text-meta);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-status-ok);
+  border-radius: 50%;
+}

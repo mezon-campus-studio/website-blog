@@ -1,0 +1,29 @@
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.primary {
+  background-color: #ffffff;
+  color: var(--color-primary);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* SECONDARY */
+.secondary {
+  background-color: var(--color-bg-soft); 
+  color: var(--color-text-title);
+  border: 1px solid var(--color-border);
+}
+
+.badge:hover {
+  opacity: 0.85;
+}
