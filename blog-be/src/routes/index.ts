@@ -4,8 +4,8 @@ import userRouter from './user.route';
 import postRoutes from './post.route';
 
 const router = Router();
-router.use("/auth", authRoutes)
-router.use("/users",userRouter);
+router.use('/auth', authRoutes);
+router.use('/users', userRouter);
 router.use('/post', postRoutes);
 
 export default router;

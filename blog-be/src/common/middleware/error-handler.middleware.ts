@@ -2,7 +2,7 @@ import { HTTPSTATUS } from '@/config/http.config';
 import { AppError, ErrorCodes } from '@/common/utils/app-error';
 import { ErrorRequestHandler } from 'express';
 
-export const errorHandler: ErrorRequestHandler = (error, req, res): any => {
+export const errorHandler: ErrorRequestHandler = (error, req, res, next): any => {
   console.error(`Error: ${req.path}`, error);
 
   if (error instanceof AppError) {

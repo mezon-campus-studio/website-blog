@@ -1,113 +1,109 @@
-import { Request, Response } from "express";
-import { HTTPSTATUS } from "@/config/http.config";
-import { UserService } from "./user.service";
-import { UpdateProfileDto } from "./dto/update-profile.dto";
-import { ChangePasswordDto } from "./dto/change-password.dto";
+import { Request, Response } from 'express';
+import { HTTPSTATUS } from '@/config/http.config';
+import { UserService } from './user.service';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 export class UserController {
-   constructor(
-      private readonly userService: UserService,
-   ) { }
+  constructor(private readonly userService: UserService) {}
 
+  async getAllUsers(req: Request, res: Response) {
+    const users = await this.userService.getAllUsers();
 
-   async getAllUsers(req: Request, res: Response) {
-      const users = await this.userService.getAllUsers();
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'Get users successfully',
+      users,
+    });
+  }
 
-      return res.status(HTTPSTATUS.OK).json({
-         message: "Get users successfully",
-         users,
+  async getProfile(req: Request, res: Response) {
+    const { userId } = req.params as { userId: string };
+
+    if (!userId) {
+      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+        message: 'Missing userId parameter',
       });
-   }
+    }
+    const profile = await this.userService.getProfile(userId);
 
-   async getProfile(req: Request, res: Response) {
-      const { userId } = req.params as { userId: string };
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'Get profile successfully',
+      profile,
+    });
+  }
 
-      if (!userId) {
-         return res.status(HTTPSTATUS.BAD_REQUEST).json({
-            message: "Missing userId parameter",
-         });
-      }
-      const profile = await this.userService.getProfile(userId);
+  async updateProfile(req: Request, res: Response) {
+    const userId = req.user?.id;
 
-      return res.status(HTTPSTATUS.OK).json({
-         message: "Get profile successfully",
-         profile,
+    if (!userId) {
+      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+        message: 'Missing authenticated user',
       });
-   }
+    }
 
-   async updateProfile(req: Request, res: Response) {
-      const userId = req.user?.id;
+    const dto = req.body as UpdateProfileDto;
+    const profile = await this.userService.updateProfile(userId, dto);
 
-      if (!userId) {
-         return res.status(HTTPSTATUS.BAD_REQUEST).json({
-            message: "Missing authenticated user",
-         });
-      }
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'Update profile successfully',
+      profile,
+    });
+  }
 
-      const dto = req.body as UpdateProfileDto;
-      const profile = await this.userService.updateProfile(userId, dto);
+  async uploadAvatar(req: Request, res: Response) {
+    const userId = req.user?.id;
 
-      return res.status(HTTPSTATUS.OK).json({
-         message: "Update profile successfully",
-         profile,
+    if (!userId) {
+      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+        message: 'Missing authenticated user',
       });
-   }
+    }
 
-   async uploadAvatar(req: Request, res: Response) {
-      const userId = req.user?.id;
+    const profile = await this.userService.updateAvatar(userId, req.file);
 
-      if (!userId) {
-         return res.status(HTTPSTATUS.BAD_REQUEST).json({
-            message: "Missing authenticated user",
-         });
-      }
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'Upload avatar successfully',
+      profile,
+    });
+  }
 
-      const profile = await this.userService.updateAvatar(userId, req.file);
+  async changePassword(req: Request, res: Response) {
+    const userId = req.user?.id;
 
-      return res.status(HTTPSTATUS.OK).json({
-         message: "Upload avatar successfully",
-         profile,
+    if (!userId) {
+      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+        message: 'Missing authenticated user',
       });
-   }
+    }
 
-   async changePassword(req: Request, res: Response) {
-      const userId = req.user?.id;
+    const dto = req.body as ChangePasswordDto;
+    await this.userService.changePassword(userId, dto);
 
-      if (!userId) {
-         return res.status(HTTPSTATUS.BAD_REQUEST).json({
-            message: "Missing authenticated user",
-         });
-      }
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'Change password successfully',
+    });
 
-      const dto = req.body as ChangePasswordDto;
-      await this.userService.changePassword(userId, dto);
+    // Có nên redirect về login sau khi đổi mật khẩu không ạ? Nếu có thì frontend sẽ clear cookie và redirect về login, backend chỉ cần trả về message success thôi
+    // return clearJwtAuthCookie(res).status(HTTPSTATUS.OK).json({
+    //    message: "Change password successfully! Please login again with your new password",
+    // });
+  }
 
-      return res.status(HTTPSTATUS.OK).json({
-         message: "Change password successfully",
+  async updateStatus(req: Request, res: Response) {
+    const { userId } = req.params as { userId: string };
+
+    const currentUserId = req.user?.id;
+
+    if (!currentUserId) {
+      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+        message: 'Missing authenticated user',
       });
+    }
 
-      // Có nên redirect về login sau khi đổi mật khẩu không ạ? Nếu có thì frontend sẽ clear cookie và redirect về login, backend chỉ cần trả về message success thôi
-      // return clearJwtAuthCookie(res).status(HTTPSTATUS.OK).json({
-      //    message: "Change password successfully! Please login again with your new password",
-      // });
-   }
+    await this.userService.updateStatus(userId, currentUserId);
 
-   async updateStatus(req: Request, res: Response) {
-      const { userId } = req.params as { userId: string };
-
-      const currentUserId = req.user?.id;
-
-      if (!currentUserId) {
-         return res.status(HTTPSTATUS.BAD_REQUEST).json({
-            message: "Missing authenticated user",
-         });
-      }
-
-      await this.userService.updateStatus(userId, currentUserId);
-
-      return res.status(HTTPSTATUS.OK).json({
-         message: "Update user status successfully",
-      });
-
-   }
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'Update user status successfully',
+    });
+  }
 }

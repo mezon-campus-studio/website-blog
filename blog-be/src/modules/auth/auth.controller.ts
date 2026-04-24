@@ -12,53 +12,48 @@ export class AuthController {
     private readonly logger: Logger,
   ) {}
 
-   async register(req: Request, res: Response) {
-      const dto = req.body as SignUpDto;
-      const user = await this.authService.register(dto);
-      const userId = user.id.toString();
+  async register(req: Request, res: Response) {
+    const dto = req.body as SignUpDto;
+    const user = await this.authService.register(dto);
+    const userId = user.id.toString();
 
-      const accessToken = setJwtAuthCookie({
-         res,
-         userId,
-      });
-      return res.status(HTTPSTATUS.CREATED)
-         .json({
-            message: "User registered successfully",
-            accessToken,
-            user,
-         });
-   };
+    const accessToken = setJwtAuthCookie({
+      res,
+      userId,
+    });
+    return res.status(HTTPSTATUS.CREATED).json({
+      message: 'User registered successfully',
+      accessToken,
+      user,
+    });
+  }
 
-   async login(req: Request, res: Response) {
-      const dto = req.body as SignInDto;
-      const user = await this.authService.login(dto);
-      const userId = user.id.toString();
-      const accessToken = setJwtAuthCookie({
-         res,
-         userId
-      });
-      return res.status(HTTPSTATUS.OK)
-         .json({
-            message: "User logged in successfully",
-            accessToken,
-            user,
-         });
-   }
+  async login(req: Request, res: Response) {
+    const dto = req.body as SignInDto;
+    const user = await this.authService.login(dto);
+    const userId = user.id.toString();
+    const accessToken = setJwtAuthCookie({
+      res,
+      userId,
+    });
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'User logged in successfully',
+      accessToken,
+      user,
+    });
+  }
 
-   async logout(req: Request, res: Response) {
-      return clearJwtAuthCookie(res).status(HTTPSTATUS.OK).json({
-         message: "User logged out successfully"
-      });
-   }
+  async logout(req: Request, res: Response) {
+    return clearJwtAuthCookie(res).status(HTTPSTATUS.OK).json({
+      message: 'User logged out successfully',
+    });
+  }
 
-   async authStatus(req: Request, res: Response) {
-      const user = req.user;
-      return res.status(HTTPSTATUS.OK).json({
-         message: "User authenticated successfully",
-         user
-      });
-   }
-
+  async authStatus(req: Request, res: Response) {
+    const user = req.user;
+    return res.status(HTTPSTATUS.OK).json({
+      message: 'User authenticated successfully',
+      user,
+    });
+  }
 }
-
- 
