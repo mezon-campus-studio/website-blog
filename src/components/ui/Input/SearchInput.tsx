@@ -13,6 +13,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ ...props }) => {
         type="text"
         className={styles.input}
         placeholder="Search insights..."
+        suppressHydrationWarning
         {...props}
       />
     </div>

@@ -57,7 +57,7 @@ html, body {
 main {
   flex: 1;
 }
-/* 🔥 GLOBAL APPLICATION (THIS FIXES YOUR ISSUE) */
+
 body {
   background-color: var(--bg-global);
   color: var(--text-global);
