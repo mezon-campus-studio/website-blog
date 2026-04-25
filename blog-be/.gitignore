@@ -1,0 +1,39 @@
+# ===== NODE =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== BUILD =====
+dist/
+build/
+
+# ===== ENV =====
+.env
+.env.*
+!.env.example
+
+# ===== LOGS =====
+logs/
+*.log
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== IDE =====
+.vscode/
+.idea/
+
+# ===== TYPESCRIPT =====
+*.tsbuildinfo
+
+# ===== PRISMA =====
+prisma/dev.db
+
+# ===== TEMP =====
+tmp/
+temp/
+
+# ===== COVERAGE =====
+coverage/
