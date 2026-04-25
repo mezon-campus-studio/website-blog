@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -43,3 +44,6 @@ next-env.d.ts
 =======
 /.vscode
 >>>>>>> 98667dea70529b15d39a0fc314dccae97fc023b6
+=======
+/.vscode
+>>>>>>> origin/Task-Home
