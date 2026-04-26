@@ -1,12 +1,12 @@
 import { PostService } from './post.service';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreatePostDto } from './dto/post.dto';
 import { NextFunction, Request, Response } from 'express';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { UpdatePostDto } from './dto/post.dto';
 
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService) { }
 
-  async createPost(req: Request, res: Response, next: NextFunction) {
+  async createPost(req: Request, res: Response, _next: NextFunction) {
     const userId = (req as any).user.id;
     const files = req.files as {
       thumbnail?: Express.Multer.File[];
@@ -25,7 +25,7 @@ export class PostController {
     });
   }
 
-  async updatePost(req: Request, res: Response, next: NextFunction) {
+  async updatePost(req: Request, res: Response, _next: NextFunction) {
     const userId = (req as any).user.id;
     const files = req.files as {
       thumbnail?: Express.Multer.File[];
