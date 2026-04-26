@@ -3,6 +3,7 @@ import cloudinary from '@/config/cloudinary.config';
 const AVATAR_FOLDER = 'website-blog/avatars';
 const IMAGE_FOLDER = 'website-blog/posts/images';
 const THUMBNAIL_FOLDER = 'website-blog/posts/thumbnails';
+
 export type CloudinaryAvatar = {
   secureUrl: string;
   publicId: string;

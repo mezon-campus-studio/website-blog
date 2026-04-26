@@ -1,30 +1,25 @@
-import { Logger } from 'winston';
 import bcrypt from 'bcrypt';
-import { plainToInstance } from 'class-transformer';
-import { validate } from 'class-validator';
+
 import {
   BadRequestException,
   InternalServerException,
   NotFoundException,
   UnauthorizedException,
 } from '@/common/utils/app-error';
-import { IUserRepository, UpdateProfileData } from './user.repository';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { IUserRepository } from './user.repository';
+
 import {
   deleteImageFromCloudinary,
   uploadAvatarToCloudinary,
   CloudinaryAvatar,
 } from '@/common/utils/cloudinary';
+import { ChangePasswordDto, UpdateProfileDto } from './user.dto';
 
 export class UserService {
-  constructor(
-    private readonly userRepository: IUserRepository,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly userRepository: IUserRepository) {}
 
-  async findUserById(userId: string) {
-    return await this.userRepository.findUserById(userId);
+  async findUserActiveById(userId: string) {
+    return await this.userRepository.findUserActiveById(userId);
   }
 
   async getAllUsers() {
@@ -32,7 +27,7 @@ export class UserService {
   }
 
   async getProfile(userId: string) {
-    const profile = await this.userRepository.findUserById(userId);
+    const profile = await this.userRepository.findUserActiveById(userId);
     if (!profile) {
       throw new NotFoundException('User profile not found');
     }
@@ -40,31 +35,14 @@ export class UserService {
     return profile;
   }
 
-  async updateProfile(userId: string, data: UpdateProfileData) {
+  async updateProfile(userId: string, data: UpdateProfileDto) {
     try {
-      const dto = plainToInstance(UpdateProfileDto, data);
-      const validationErrors = await validate(dto, {
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      });
-
-      if (validationErrors.length > 0) {
-        throw new BadRequestException('Invalid profile data');
-      }
-
-      if (dto.name === undefined && dto.bio === undefined) {
-        throw new BadRequestException('No profile fields provided');
-      }
-
       return await this.userRepository.updateProfile(userId, {
-        name: dto.name,
-        bio: dto.bio,
+        name: data.name,
+        bio: data.bio,
       });
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new InternalServerException('Failed to update profile');
+      throw error;
     }
   }
 
@@ -77,17 +55,16 @@ export class UserService {
 
     try {
       uploadedAvatar = await uploadAvatarToCloudinary(file.buffer, file.originalname);
+
+      if (!uploadedAvatar || !uploadedAvatar.secureUrl) {
+        throw new InternalServerException('Failed to upload avatar to cloud storage');
+      }
+
       return await this.userRepository.updateAvatar(userId, uploadedAvatar.secureUrl);
     } catch (error) {
       if (uploadedAvatar) {
         const publicId = uploadedAvatar.publicId;
-        await deleteImageFromCloudinary(publicId).catch((rollbackError) => {
-          this.logger.warn('Failed to rollback avatar on Cloudinary', {
-            userId,
-            publicId,
-            rollbackError,
-          });
-        });
+        await deleteImageFromCloudinary(publicId);
       }
 
       if (error instanceof BadRequestException) {
@@ -99,17 +76,7 @@ export class UserService {
 
   async changePassword(userId: string, data: ChangePasswordDto) {
     try {
-      const dto = plainToInstance(ChangePasswordDto, data);
-      const validationErrors = await validate(dto, {
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      });
-
-      if (validationErrors.length > 0) {
-        throw new BadRequestException('Invalid password data');
-      }
-
-      if (dto.newPassword !== dto.confirmNewPassword) {
+      if (data.newPassword !== data.confirmNewPassword) {
         throw new BadRequestException('New password and confirmation do not match');
       }
 
@@ -119,17 +86,20 @@ export class UserService {
         throw new NotFoundException('User profile not found');
       }
 
-      const isCurrentPasswordValid = await bcrypt.compare(dto.currentPassword, currentPasswordHash);
+      const isCurrentPasswordValid = await bcrypt.compare(
+        data.currentPassword,
+        currentPasswordHash,
+      );
       if (!isCurrentPasswordValid) {
         throw new UnauthorizedException('Current password is incorrect');
       }
 
-      const isSameAsOldPassword = await bcrypt.compare(dto.newPassword, currentPasswordHash);
+      const isSameAsOldPassword = await bcrypt.compare(data.newPassword, currentPasswordHash);
       if (isSameAsOldPassword) {
         throw new BadRequestException('New password must be different from current password');
       }
 
-      const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+      const hashedPassword = await bcrypt.hash(data.newPassword, 10);
       await this.userRepository.changePassword(userId, hashedPassword);
     } catch (error) {
       throw new InternalServerException('Failed to change password');
@@ -138,7 +108,7 @@ export class UserService {
 
   async updateStatus(userId: string, currentUserId: string | undefined) {
     try {
-      const user = await this.userRepository.findUserByIdForAdmin(userId);
+      const user = await this.userRepository.findUserByAdmin(userId);
 
       if (!user) {
         throw new NotFoundException('User not found');
