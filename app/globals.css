@@ -1,0 +1,135 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  /* Core Theme Colors (HSL) */
+  --background-hsl: 0 0% 100%;
+  --foreground-hsl: 0 0% 3.6%;
+  --card-bg-hsl: 0 0% 100%;
+  --card-border-hsl: 0 0% 89.8%;
+  
+  --primary-hsl: 217.2 91.2% 59.8%;
+  --primary-hover-hsl: 217.2 91.2% 50%;
+  --secondary-hsl: 160 84% 39.8%;
+  --destructive-hsl: 0 84.2% 60.2%;
+  --muted-hsl: 210 40% 96%;
+  --muted-foreground-hsl: 215.4 16.3% 46.9%;
+
+  /* Color Mappings */
+  --color-background: hsl(var(--background-hsl));
+  --color-foreground: hsl(var(--foreground-hsl));
+  --color-card-bg: hsl(var(--card-bg-hsl));
+  --color-card-border: hsl(var(--card-border-hsl));
+  --color-primary: hsl(var(--primary-hsl));
+  --color-primary-hover: hsl(var(--primary-hover-hsl));
+  --color-secondary: hsl(var(--secondary-hsl));
+  --color-destructive: hsl(var(--destructive-hsl));
+  --color-muted: hsl(var(--muted-hsl));
+  --color-muted-foreground: hsl(var(--muted-foreground-hsl));
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: Georgia, "Times New Roman", serif;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Legacy Compatibility Aliases */
+  --color-text: var(--color-foreground);
+  --color-bg: var(--color-background);
+  --color-muted: var(--color-muted-foreground);
+  --color-border: var(--color-card-border);
+  --color-surface: var(--color-card-bg);
+
+  /* Transitions */
+  --transition-shortest: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-shorter: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-short: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-standard: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] {
+  --background-hsl: 217.2 32.6% 12%;
+  --foreground-hsl: 210 40% 98%;
+  --card-bg-hsl: 217.2 32.6% 18%;
+  --card-border-hsl: 217.2 32.6% 25%;
+  
+  --primary-hsl: 217.2 91.2% 59.8%;
+  --primary-hover-hsl: 217.2 91.2% 70%;
+  --secondary-hsl: 160 84% 39.8%;
+  --destructive-hsl: 0 84.2% 60.2%;
+  --muted-hsl: 215 27.9% 16.9%;
+  --muted-foreground-hsl: 215 20.2% 75.1%;
+
+  --color-background: hsl(var(--background-hsl));
+  --color-foreground: hsl(var(--foreground-hsl));
+  --color-card-bg: hsl(var(--card-bg-hsl));
+  --color-card-border: hsl(var(--card-border-hsl));
+  --color-primary: hsl(var(--primary-hsl));
+  --color-primary-hover: hsl(var(--primary-hover-hsl));
+  --color-secondary: hsl(var(--secondary-hsl));
+  --color-destructive: hsl(var(--destructive-hsl));
+  --color-muted: hsl(var(--muted-hsl));
+  --color-muted-foreground: hsl(var(--muted-foreground-hsl));
+
+  /* Restore contrast for legacy text variables */
+  --color-text: var(--color-foreground);
+  --color-muted: var(--color-muted-foreground);
+}
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
+  --color-secondary: var(--color-secondary);
+  --color-destructive: var(--color-destructive);
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-card-bg: var(--color-card-bg);
+  --color-card-border: var(--color-card-border);
+  
+  --spacing-md: var(--spacing-md);
+  --spacing-lg: var(--spacing-lg);
+  --radius-lg: var(--radius-lg);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+main {
+  flex: 1;
+}
+
+.formFooter {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-card-border);
+}
+
+.footerNav {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
