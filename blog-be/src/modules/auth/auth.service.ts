@@ -13,15 +13,14 @@ export class AuthService {
   async register(body: SignUpDto) {
     try {
       const { name, email, password, confirmPassword } = body;
-
-      if (password !== confirmPassword) {
-        throw new UnauthorizedException('Passwords do not match');
-      }
-
       const existingUser = await this.authRepository.findUserByEmail(email);
 
       if (existingUser) {
         throw new UnauthorizedException('User with this email already exists');
+      }
+
+      if (password !== confirmPassword) {
+        throw new UnauthorizedException('Passwords do not match');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,7 +41,6 @@ export class AuthService {
   async login(body: SignInDto) {
     try {
       const { email, password } = body;
-
       const user = await this.authRepository.findUserByEmail(email);
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -52,7 +50,7 @@ export class AuthService {
       return await this.authRepository.updateLastLogin(user.id, new Date());
     } catch (error) {
       if (error instanceof UnauthorizedException) {
-        throw error;
+        
       }
 
       throw new InternalServerException('Failed to login');

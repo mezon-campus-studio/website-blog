@@ -13,8 +13,9 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import {
   deleteImageFromCloudinary,
-  uploadAvatarToCloudinary,
+  uploadToCloudinary,
   CloudinaryAvatar,
+  FolderType,
 } from '@/common/utils/cloudinary';
 
 export class UserService {
@@ -76,7 +77,7 @@ export class UserService {
     let uploadedAvatar: CloudinaryAvatar | undefined;
 
     try {
-      uploadedAvatar = await uploadAvatarToCloudinary(file.buffer, file.originalname);
+      uploadedAvatar = await uploadToCloudinary(file.buffer, file.originalname, FolderType.AVATARS);
       return await this.userRepository.updateAvatar(userId, uploadedAvatar.secureUrl);
     } catch (error) {
       if (uploadedAvatar) {
