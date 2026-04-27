@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node --require tsconfig-paths/register src/app.ts",
-    "build": "tsc",
-    "start": "node dist/app.js",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/src/app.js",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
@@ -57,6 +57,7 @@
     "prettier": "^3.8.3",
     "prisma": "5.22.0",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^6.0.2"
   }
