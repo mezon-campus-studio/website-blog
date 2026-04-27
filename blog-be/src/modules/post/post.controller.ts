@@ -134,4 +134,41 @@ export class PostController {
       data: posts,
     });
   }
+
+  async getReaderPosts(req: Request, res: Response, next: NextFunction) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const categoryId = req.query.category_id as string | undefined;
+    const tagId = req.query.tag_id as string | undefined;
+    const posts = await this.postService.getReaderPosts(page, limit, categoryId, tagId);
+
+    res.status(200).json({
+      message: 'Reader posts fetched successfully',
+      data: posts,
+    });
+  }
+
+  async getReaderPostsByTagId(req: Request, res: Response, next: NextFunction) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const tagId = req.params.tag_id as string;
+    const posts = await this.postService.getReaderPostsByTagId(page, limit, tagId);
+
+    res.status(200).json({
+      message: 'Reader posts by tag fetched successfully',
+      data: posts,
+    });
+  }
+
+  async getReaderPostsByCategorySlug(req: Request, res: Response, next: NextFunction) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const slug = req.params.slug as string;
+    const posts = await this.postService.getReaderPostsByCategorySlug(page, limit, slug);
+
+    res.status(200).json({
+      message: 'Reader posts by category slug fetched successfully',
+      data: posts,
+    });
+  }
 }

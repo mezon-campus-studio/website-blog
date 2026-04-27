@@ -34,6 +34,18 @@ postRouter.get(
   asyncHandler(postController.getPostByCategoryId.bind(postController)),
 );
 
+postRouter.get('/reader', asyncHandler(postController.getReaderPosts.bind(postController)));
+
+postRouter.get(
+  '/reader/tag/:tag_id',
+  asyncHandler(postController.getReaderPostsByTagId.bind(postController)),
+);
+
+postRouter.get(
+  '/reader/category/:slug',
+  asyncHandler(postController.getReaderPostsByCategorySlug.bind(postController)),
+);
+
 postRouter.put(
   '/:post_id',
   passportAuthenticateJwt,

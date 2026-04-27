@@ -1,6 +1,7 @@
 import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from '@prisma/client';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
 
 export interface IPostRepository {
   createPost(
@@ -48,4 +49,6 @@ export interface IPostRepository {
     userId: string,
     isDraft: boolean,
   ): Promise<Post[]>;
+
+  findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]>;
 }

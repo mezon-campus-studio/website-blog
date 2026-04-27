@@ -247,4 +247,37 @@ export class PostService {
   ): Promise<Post[]> {
     return await this.postRepository.findPostByUserIdAndDraftStatus(page, limit, userId, isDraft);
   }
+
+  async getReaderPosts(page: number, limit: number, categoryId?: string, tagId?: string) {
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      categoryId,
+      tagId,
+    });
+  }
+
+  async getReaderPostsByTagId(page: number, limit: number, tagId: string) {
+    if (!tagId) {
+      throw new BadRequestException('Tag id is required');
+    }
+
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      tagId,
+    });
+  }
+
+  async getReaderPostsByCategorySlug(page: number, limit: number, categorySlug: string) {
+    if (!categorySlug) {
+      throw new BadRequestException('Category slug is required');
+    }
+
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      categorySlug,
+    });
+  }
 }

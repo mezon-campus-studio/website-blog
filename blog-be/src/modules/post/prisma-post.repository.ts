@@ -3,6 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ReaderPostFilter, ReaderPostItem, readerPostArgs } from '@/types/post-reader.type';
 
 export class PrismaPostRepository implements IPostRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -195,5 +196,54 @@ export class PrismaPostRepository implements IPostRepository {
       skip: (page - 1) * limit,
       take: limit,
     });
+  }
+
+  async findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]> {
+    const where: any = {
+      isDeleted: false,
+      isActive: true,
+      isDraft: false,
+      category: {
+        isDeleted: false,
+        isActive: true,
+      },
+    };
+
+    if (filter.categoryId) {
+      where.categoryId = filter.categoryId;
+    }
+
+    if (filter.categorySlug) {
+      where.category = {
+        ...where.category,
+        slug: filter.categorySlug,
+      };
+    }
+
+    if (filter.tagId) {
+      where.tags = {
+        some: {
+          tagId: filter.tagId,
+          isDeleted: false,
+          isActive: true,
+          tag: {
+            isDeleted: false,
+            isActive: true,
+          },
+        },
+      };
+    }
+
+    const posts = await this.prisma.post.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (filter.page - 1) * filter.limit,
+      take: filter.limit,
+      ...readerPostArgs,
+    });
+
+    return posts;
   }
 }
