@@ -1,0 +1,298 @@
+// prisma/schema.prisma
+
+generator client {
+   provider = "prisma-client-js"
+   output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+   provider = "mysql"
+   url      = env("DATABASE_URL")
+}
+
+enum ROLE {
+   USER
+   ADMIN
+}
+
+model User {
+   id          String   @id @default(uuid()) @db.Char(36)
+   email       String   @unique @db.VarChar(255)
+   password    String   @db.VarChar(255)
+   name        String   @db.VarChar(255)
+   avatar_url  String?  @db.VarChar(255)
+   bio         String?  @db.Text
+   role        ROLE     @default(USER)
+   createdAt   DateTime @default(now())
+   updatedAt   DateTime @updatedAt
+   createdBy   String?  @db.Char(255)
+   updatedBy   String?  @db.Char(255)
+   isActive    Boolean  @default(true)
+   isDeleted   Boolean  @default(false)
+   lastLoginAt DateTime?
+
+   posts         Post[]
+   likes         PostLike[]
+   comments      PostComment[]
+   shares        PostShare[]
+   bookmarks     PostBookmark[]
+   interactions  UserInteraction[]
+   notifications Notification[]
+   reports       Report[]
+
+   @@map("users")
+}
+enum SharePlatform {
+  FACEBOOK
+  TWITTER
+  LINKEDIN
+  COPY_LINK
+}
+
+enum InteractionType {
+  LIKE
+  COMMENT
+  SHARE
+  BOOKMARK
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  SHARE
+  BOOKMARK
+  REPORT
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  REJECTED
+  RESOLVED
+}
+
+model Category {
+  id          String    @id @default(uuid()) @db.Char(36)
+  name        String    @db.VarChar(255)
+  description String?   @db.Text
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdBy   String?   @map("created_by") @db.Char(36)
+  updatedBy   String?   @map("updated_by") @db.Char(36)
+  isActive    Boolean   @default(true) @map("is_actived")
+  isDeleted   Boolean   @default(false) @map("is_deleted")
+
+  posts       Post[]
+
+  @@map("category")
+}
+
+model Post {
+  id           String            @id @default(uuid()) @db.Char(36)
+  userId       String            @map("user_id") @db.Char(36)
+  categoryId   String            @map("category_id") @db.Char(36)
+  title        String            @db.VarChar(255)
+  slug         String            @unique @db.VarChar(255)
+  content      String            @db.Text
+  likeCount    Int               @default(0) @map("like_count")
+  thumbnailUrl String?           @map("thumbnail_url") @db.VarChar(500)
+  thumbnailPublicId String?      @map("thumbnail_public_id") @db.VarChar(255)
+  images       Json?
+  isDraft      Boolean           @default(true) @map("is_draft")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+  createdBy    String?           @map("created_by") @db.Char(36)
+  updatedBy    String?           @map("updated_by") @db.Char(36)
+  isActive     Boolean           @default(true) @map("is_active")
+  isDeleted    Boolean           @default(false) @map("is_deleted")
+
+  user         User              @relation(fields: [userId], references: [id])
+  category     Category          @relation(fields: [categoryId], references: [id])
+  tags         PostTag[]
+  likes        PostLike[]
+  comments     PostComment[]
+  shares       PostShare[]
+  bookmarks    PostBookmark[]
+  interactions UserInteraction[]
+  notifications Notification[]
+  reports      Report[]
+
+  @@map("post")
+  @@index([userId, isDraft, createdAt])
+  @@index([categoryId])
+}
+
+model Tag {
+  id         String    @id @default(uuid()) @db.Char(36)
+  name       String    @unique @db.VarChar(255)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  createdBy  String?   @map("created_by") @db.Char(36)
+  updatedBy  String?   @map("updated_by") @db.Char(36)
+  isActive   Boolean   @default(true) @map("is_actived")
+  isDeleted  Boolean   @default(false) @map("is_deleted")
+
+  posts      PostTag[]
+
+  @@map("tag")
+}
+
+model PostTag {
+  postId     String    @map("post_id") @default(uuid()) @db.Char(36)
+  tagId      String    @map("tag_id")  @db.Char(36)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  createdBy  String?   @map("created_by") @db.Char(36)
+  updatedBy  String?   @map("updated_by") @db.Char(36)
+  isActive   Boolean   @default(true) @map("is_actived")
+  isDeleted  Boolean   @default(false) @map("is_deleted")
+
+  post       Post      @relation(fields: [postId], references: [id])
+  tag        Tag       @relation(fields: [tagId], references: [id])
+
+  @@id([postId, tagId])
+  @@map("post_tag")
+}
+
+model PostLike {
+  id         String    @id @default(uuid()) @db.Char(36)
+  postId     String    @map("post_id") @db.Char(36)
+  userId     String    @map("user_id") @db.Char(36)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  createdBy  String?   @map("created_by") @db.Char(36)
+  updatedBy  String?   @map("updated_by") @db.Char(36)
+  isActive   Boolean   @default(true) @map("is_actived")
+  isDeleted  Boolean   @default(false) @map("is_deleted")
+
+  post       Post      @relation(fields: [postId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+  @@map("post_like")
+  @@index([userId])
+}
+
+model PostComment {
+  id         String         @id @default(uuid()) @db.Char(36)
+  postId     String         @map("post_id") @db.Char(36)
+  userId     String         @map("user_id") @db.Char(36)
+  parentId   String?        @map("parent_id") @db.Char(36)
+  content    String         @db.Text
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+  createdBy  String?        @map("created_by") @db.Char(36)
+  updatedBy  String?        @map("updated_by") @db.Char(36)
+  isActive   Boolean        @default(true) @map("is_actived")
+  isDeleted  Boolean        @default(false) @map("is_deleted")
+
+  post       Post           @relation(fields: [postId], references: [id])
+  user       User           @relation(fields: [userId], references: [id])
+  parent     PostComment?   @relation("CommentReplies", fields: [parentId], references: [id])
+  replies    PostComment[]  @relation("CommentReplies")
+
+  @@map("post_comment")
+  @@index([postId, createdAt])
+  @@index([parentId])
+}
+
+model PostShare {
+  id         String         @id @default(uuid()) @db.Char(36)
+  postId     String         @map("post_id") @db.Char(36)
+  userId     String         @map("user_id") @db.Char(36)
+  platform   SharePlatform?
+  createdAt  DateTime       @default(now()) @map("created_at")
+  updatedAt  DateTime       @updatedAt @map("updated_at")
+  createdBy  String?        @map("created_by") @db.Char(36)
+  updatedBy  String?        @map("updated_by") @db.Char(36)
+  isActive   Boolean        @default(true) @map("is_actived")
+  isDeleted  Boolean        @default(false) @map("is_deleted")
+
+  post       Post           @relation(fields: [postId], references: [id])
+  user       User           @relation(fields: [userId], references: [id])
+
+  @@map("post_share")
+}
+
+model PostBookmark {
+  id         String    @id @default(uuid()) @db.Char(36)
+  postId     String    @map("post_id") @db.Char(36)
+  userId     String    @map("user_id") @db.Char(36)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  createdBy  String?   @map("created_by") @db.Char(36)
+  updatedBy  String?   @map("updated_by") @db.Char(36)
+  isActive   Boolean   @default(true) @map("is_actived")
+  isDeleted  Boolean   @default(false) @map("is_deleted")
+
+  post       Post      @relation(fields: [postId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@unique([postId, userId])
+  @@map("post_bookmark")
+  @@index([userId])
+}
+
+model UserInteraction {
+  id         String           @id @default(uuid()) @db.Char(36)
+  postId     String           @map("post_id") @db.Char(36)
+  userId     String           @map("user_id") @db.Char(36)
+  type       InteractionType
+  targetId   String?          @map("target_id") @db.Char(36)
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+  createdBy  String?          @map("created_by") @db.Char(36)
+  updatedBy  String?          @map("updated_by") @db.Char(36)
+  isActive   Boolean          @default(true) @map("is_actived")
+  isDeleted  Boolean          @default(false) @map("is_deleted")
+
+  post       Post             @relation(fields: [postId], references: [id])
+  user       User             @relation(fields: [userId], references: [id])
+
+  @@map("user_interaction")
+  @@unique([userId, postId, type])
+  @@index([userId, type])
+  @@index([postId])
+}
+
+model Notification {
+  id         String            @id @default(uuid()) @db.Char(36)
+  userId     String            @map("user_id") @db.Char(36)
+  type       NotificationType
+  message    String            @db.Text
+  targetId   String?           @map("target_id") @db.Char(36)
+  postId     String?           @map("post_id") @db.Char(36)
+  createdAt  DateTime          @default(now()) @map("created_at")
+  updatedAt  DateTime          @updatedAt @map("updated_at")
+  createdBy  String?           @map("created_by") @db.Char(36)
+  updatedBy  String?           @map("updated_by") @db.Char(36)
+  isActive   Boolean           @default(true) @map("is_actived")
+  isDeleted  Boolean           @default(false) @map("is_deleted")
+
+  user       User              @relation(fields: [userId], references: [id])
+  post       Post?             @relation(fields: [postId], references: [id])
+
+  @@map("notifications")
+  @@index([userId, createdAt])
+}
+
+model Report {
+  id         String        @id @default(uuid()) @db.Char(36)
+  postId     String        @map("post_id") @db.Char(36)
+  userId     String        @map("user_id") @db.Char(36)
+  reason     String?       @db.Text
+  status     ReportStatus
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+  createdBy  String?       @map("created_by") @db.Char(36)
+  updatedBy  String?       @map("updated_by") @db.Char(36)
+  isActive   Boolean       @default(true) @map("is_actived")
+  isDeleted  Boolean       @default(false) @map("is_deleted")
+
+  post       Post          @relation(fields: [postId], references: [id])
+  user       User          @relation(fields: [userId], references: [id])
+
+  @@map("report")
+  @@index([postId])
+  @@index([userId])
+}

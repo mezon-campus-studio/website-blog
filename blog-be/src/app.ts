@@ -1,22 +1,32 @@
-import express, { Request, Response } from 'express';
+import 'dotenv/config';
+import express from 'express';
 import cors from 'cors';
-
 import routes from './routes';
-
-import { errorMiddleware } from './middleware/error.middleware';
+import { errorHandler } from './common/middleware/error-handler.middleware';
+import { Env } from './config/env.config';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
 
 const app = express();
 
+const PORT = Env.PORT || 5000;
+
+app.use(express.json({ limit: '50mb' }));
+
+app.use(cookieParser());
+
+app.use(passport.initialize());
+
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors());
-app.use(express.json());
 
 app.use('/api', routes);
 
-// test route
-app.get('/', (req: Request, res: Response) => {
-  res.send('API is running...');
-});
+app.use(errorHandler);
 
-app.use(errorMiddleware);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 export default app;
