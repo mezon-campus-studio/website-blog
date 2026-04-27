@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node --require tsconfig-paths/register src/app.ts",
-    "build": "tsc",
+    "build": "tsc && npx tsc-alias",
     "start": "node dist/app.js",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
