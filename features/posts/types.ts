@@ -7,6 +7,8 @@ export interface Post {
   categoryId: string;
   isDraft: boolean;
   userId: string;
+  category?: { name: string };
+  user?: { name: string; avatar_url?: string };
   tags?: { tag: { name: string } }[];
   createdAt: string;
   updatedAt: string;

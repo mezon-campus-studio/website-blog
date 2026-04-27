@@ -1,9 +1,11 @@
 "use client";
-import type { FormEvent } from 'react';
-import { useState } from 'react';
+
+import { useState, useEffect, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
-import { useLogin } from '@/features/auth/hooks';
+import { useLogin, useAuth } from '@/features/auth/hooks';
 import styles from './LoginPage.module.css';
 
 const GithubIcon = ({ size = 24 }: { size?: number }) => (
@@ -16,17 +18,29 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
+  
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { mutate: login, isPending, error: authError } = useLogin();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     login({ email, password });
   };
 
+  const getErrorMessage = (error: any) => {
+    if (!error) return undefined;
+    return error.response?.data?.message || error.message || 'An error occurred during login';
+  };
+
   return (
     <div className={styles.container}>
-
       <div className={styles.layoutGrid}>
         <div className={styles.leftSide}>
           <div className={styles.brandContent}>
@@ -46,8 +60,6 @@ export default function LoginPage() {
               <p>Continue your journey through the curated world of knowledge.</p>
             </header>
 
-
-
             <form onSubmit={handleSubmit} className={styles.form}>
               <Input
                 label="EMAIL ADDRESS"
@@ -55,8 +67,9 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 fullWidth
-                error={authError ? (authError as Error).message : undefined}
+                error={getErrorMessage(authError)}
                 className={styles.formInput}
+                required
               />
 
               <Input
@@ -67,6 +80,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 fullWidth
                 className={styles.formInput}
+                required
                 endNode={
                   <button
                     type="button"
@@ -84,7 +98,7 @@ export default function LoginPage() {
                   <input type="checkbox" className={styles.checkbox} />
                   <span>Remember me</span>
                 </label>
-                <a href="#" className={styles.forgotLink}>Forgot Password?</a>
+                <Link href="/forgot-password" className={styles.forgotLink}>Forgot Password?</Link>
               </div>
 
               <Button 
@@ -114,14 +128,14 @@ export default function LoginPage() {
 
             <p className={styles.signUpPrompt}>
               Don't have an account yet?{' '}
-              <a href="/signup" className={styles.linkBold}>Create an account</a>
+              <Link href="/signup" className={styles.linkBold}>Create an account</Link>
             </p>
 
             <footer className={styles.formFooter}>
               <nav className={styles.footerNav}>
-                <a href="#">PRIVACY POLICY</a>
-                <a href="#">TERMS OF SERVICE</a>
-                <a href="#">HELP CENTER</a>
+                <Link href="#">PRIVACY POLICY</Link>
+                <Link href="#">TERMS OF SERVICE</Link>
+                <Link href="#">HELP CENTER</Link>
               </nav>
               <div className={styles.footer}>
                 <p>&copy; 2026 The Curator. All rights reserved.</p>

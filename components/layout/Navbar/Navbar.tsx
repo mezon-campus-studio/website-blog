@@ -86,7 +86,7 @@ export const Navbar = () => {
                 <span>{user.name}</span>
               </Link>
               <button 
-                onClick={logout}
+                onClick={() => logout()}
                 className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                 title="Log out"
               >

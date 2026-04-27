@@ -1,9 +1,11 @@
 "use client";
-import type { FormEvent } from 'react';
-import { useState } from 'react';
+
+import { useState, useEffect, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
-import { useSignup } from '@/features/auth/hooks';
+import { useSignup, useAuth } from '@/features/auth/hooks';
 import styles from './SignUpPage.module.css';
 
 const GithubIcon = ({ size = 24 }: { size?: number }) => (
@@ -24,7 +26,15 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { mutate: signup, isPending, error: apiError } = useSignup();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,19 +83,16 @@ export default function SignUpPage() {
     signup(formData);
   };
 
-  const handleSocialSignUp = (provider: string) => {
-    console.log(`Sign up with ${provider}`);
+  const getErrorMessage = (error: any) => {
+    if (!error) return undefined;
+    return error.response?.data?.message || error.message || 'An error occurred during registration';
   };
 
   return (
-    <>
-
-      <div className={styles.container}>
-        <div className={styles.layoutGrid}>
-        {/* Left Side - Form */}
+    <div className={styles.container}>
+      <div className={styles.layoutGrid}>
         <div className={styles.formSide}>
           <div className={styles.formContainer}>
-            {/* Mobile Logo */}
             <div className={styles.mobileLogo}>
               <h1>The Curator</h1>
             </div>
@@ -95,13 +102,10 @@ export default function SignUpPage() {
               <p>Join our community of digital curators and start organizing the world's knowledge.</p>
             </div>
 
-
-
-            {/* Sign Up Form */}
             <form onSubmit={handleSubmit} className={styles.form}>
               {apiError && (
                 <div className={styles.errorMessage}>
-                  <p>{(apiError as Error).message}</p>
+                  <p>{getErrorMessage(apiError)}</p>
                 </div>
               )}
 
@@ -114,6 +118,7 @@ export default function SignUpPage() {
                 onChange={handleChange}
                 error={errors.name}
                 fullWidth
+                required
               />
 
               <Input
@@ -125,6 +130,7 @@ export default function SignUpPage() {
                 onChange={handleChange}
                 error={errors.email}
                 fullWidth
+                required
               />
 
               <Input
@@ -137,6 +143,7 @@ export default function SignUpPage() {
                 error={errors.password}
                 helperText={!errors.password && formData.password ? 'Password must be at least 8 characters long' : undefined}
                 fullWidth
+                required
                 endNode={
                   <button
                     type="button"
@@ -158,6 +165,7 @@ export default function SignUpPage() {
                 onChange={handleChange}
                 error={errors.confirmPassword}
                 fullWidth
+                required
                 endNode={
                   <button
                     type="button"
@@ -185,9 +193,9 @@ export default function SignUpPage() {
                 />
                 <label htmlFor="agreeTerms" className={styles.checkboxLabel}>
                   I agree to the{' '}
-                  <a href="#">Terms of Service</a>
+                  <Link href="#">Terms of Service</Link>
                   {' '}and{' '}
-                  <a href="#">Privacy Policy</a>
+                  <Link href="#">Privacy Policy</Link>
                 </label>
               </div>
               {errors.terms && <p className={styles.fieldError}>{errors.terms}</p>}
@@ -202,19 +210,16 @@ export default function SignUpPage() {
               </Button>
             </form>
 
-            {/* Divider */}
             <div className={styles.divider}>
               <div className={styles.dividerLine}></div>
               <span className={styles.dividerText}>Or continue with</span>
               <div className={styles.dividerLine}></div>
             </div>
 
-            {/* Social Sign Up */}
             <div className={styles.socialButtons}>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => handleSocialSignUp('Google')}
                 className={styles.socialBtn}
               >
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width={18} alt="Google" />
@@ -224,7 +229,6 @@ export default function SignUpPage() {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => handleSocialSignUp('GitHub')}
                 className={styles.socialBtn}
               >
                 <GithubIcon size={18} />
@@ -234,17 +238,15 @@ export default function SignUpPage() {
 
             <div className={styles.signInLink}>
               Already have an account?{' '}
-              <a href="/login">Log in</a>
+              <Link href="/login">Log in</Link>
             </div>
 
-            {/* Footer */}
             <div className={styles.footer}>
               <p>&copy; 2026 The Curator. All rights reserved.</p>
             </div>
           </div>
         </div>
 
-        {/* Right Side - Featured Card */}
         <div className={styles.featuredSide}>
           <div className={styles.featuredCard}>
             <div className={styles.featuredHeader}>Featured Curator</div>
@@ -265,8 +267,7 @@ export default function SignUpPage() {
           </div>
           <div className={styles.overlay}></div>
         </div>
-        </div>
       </div>
-    </>
+    </div>
   );
 }

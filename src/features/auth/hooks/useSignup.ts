@@ -1,4 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+import { AuthResponse } from '@/features/auth/types';
+import { useAuth } from '../context/AuthContext';
 
 interface SignupCredentials {
   name: string;
@@ -7,29 +10,16 @@ interface SignupCredentials {
   confirmPassword: string;
 }
 
-interface SignupResponse {
-  token: string;
-  user: { email: string; name: string };
-}
-
-/**
- * useSignup — mutation hook for registering a new user.
- * Replace mutationFn with real API call when backend is ready.
- */
 export function useSignup() {
-  return useMutation<SignupResponse, Error, SignupCredentials>({
+  const { login: setAuthState } = useAuth();
+
+  return useMutation<AuthResponse, Error, SignupCredentials>({
     mutationFn: async (credentials) => {
-      // TODO: Replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      if (credentials.email === 'error@example.com') {
-        throw new Error('This email is already registered. Please log in instead.');
-      }
-
-      return {
-        token: 'mock-token',
-        user: { email: credentials.email, name: credentials.name },
-      };
+      const response = await apiClient.post<AuthResponse>('/auth/register', credentials);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setAuthState(data.accessToken, data.user);
     },
   });
 }
