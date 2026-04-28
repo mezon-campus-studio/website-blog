@@ -1,5 +1,5 @@
 import { CreatePostDto } from './dto/post.dto';
-import { Post } from '@prisma/client';
+import { Category, Post } from '@prisma/client';
 import { UpdatePostDto } from './dto/post.dto';
 import { ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
 
@@ -52,5 +52,5 @@ export interface IPostRepository {
 
   findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]>;
   
-  findCategoryById(categoryId: string): Promise<Post[]>;
+  findCategoryById(categoryId: string): Promise<Category | null>;
 }

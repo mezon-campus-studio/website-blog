@@ -35,7 +35,6 @@ export class PostService {
       if (data.categoryId == null && !c) {
         throw new BadRequestException('Category is required');
       }
-      
       if (!c) {
         throw new BadRequestException('Category not found');
       }

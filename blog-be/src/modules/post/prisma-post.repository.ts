@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client/extension';
 import { CreatePostDto } from './dto/post.dto';
-import { Post } from '@prisma/client';
+import { Category, Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
 import { UpdatePostDto } from './dto/post.dto';
 import { readerPostArgs, ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
@@ -235,11 +235,10 @@ export class PrismaPostRepository implements IPostRepository {
     return posts;
   }
 
-  findCategoryById(categoryId: string): Promise<Post[]> {
-    return this.prisma.post.findMany({
+  async findCategoryById(categoryId: string): Promise<Category> {
+    return await this.prisma.post.findMany({
       where: {
         categoryId,
-       
       },
     });
   }
