@@ -5,22 +5,15 @@ import prisma from '@/lib/prisma';
 import { PrismaUserRepository } from '@/modules/user/prisma-user.repository';
 import { UserController } from '@/modules/user/user.controller';
 import { UserService } from '@/modules/user/user.service';
-import { UpdateProfileDto } from '@/modules/user/dto/update-profile.dto';
-import { ChangePasswordDto } from '@/modules/user/dto/change-password.dto';
+
 import { Router } from 'express';
-import { loggers, format, transports, Logger } from 'winston';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
 import { uploadImage } from '@/common/middleware/upload-image.middleware';
+import { ChangePasswordDto, UpdateProfileDto } from '@/modules/user/user.dto';
 
-loggers.add('user', {
-  format: format.combine(format.timestamp(), format.json()),
-  transports: [new transports.Console()],
-});
-
-const logger = loggers.get('user') as Logger;
 const userRouter = Router();
-const useRepository = new PrismaUserRepository(prisma, logger);
-const userService = new UserService(useRepository, logger);
+const useRepository = new PrismaUserRepository(prisma);
+const userService = new UserService(useRepository);
 const userController = new UserController(userService);
 
 userRouter.use(passportAuthenticateJwt);
