@@ -10,8 +10,9 @@ import { IUserRepository } from './user.repository';
 
 import {
   deleteImageFromCloudinary,
-  uploadAvatarToCloudinary,
+  uploadToCloudinary,
   CloudinaryAvatar,
+  FolderType,
 } from '@/common/utils/cloudinary';
 import { ChangePasswordDto, UpdateProfileDto } from './user.dto';
 
@@ -54,12 +55,7 @@ export class UserService {
     let uploadedAvatar: CloudinaryAvatar | undefined;
 
     try {
-      uploadedAvatar = await uploadAvatarToCloudinary(file.buffer, file.originalname);
-
-      if (!uploadedAvatar || !uploadedAvatar.secureUrl) {
-        throw new InternalServerException('Failed to upload avatar to cloud storage');
-      }
-
+      uploadedAvatar = await uploadToCloudinary(file.buffer, file.originalname, FolderType.AVATARS);
       return await this.userRepository.updateAvatar(userId, uploadedAvatar.secureUrl);
     } catch (error) {
       if (uploadedAvatar) {

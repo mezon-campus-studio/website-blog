@@ -2,13 +2,13 @@ import prisma from '@/lib/prisma';
 import { PostController } from '@/modules/post/post.controller';
 import { PostService } from '@/modules/post/post.service';
 import { PrismaPostRepository } from '@/modules/post/prisma-post.repository';
-import { NextFunction, Request, Response, Router } from 'express';
+import { Router } from 'express';
 import { passportAuthenticateJwt } from '@/config/passport.config';
 import { uploadImage } from '@/common/middleware/upload-image.middleware';
 import { validateDto } from '@/common/middleware/validate-dto.middleware';
-import { CreatePostDto } from '@/modules/post/dto/create-post.dto';
+import { CreatePostDto } from '@/modules/post/dto/post.dto';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
-import { UpdatePostDto } from '@/modules/post/dto/update-post.dto';
+import { UpdatePostDto } from '@/modules/post/dto/post.dto';
 
 const postRouter = Router();
 const postRepository = new PrismaPostRepository(prisma);

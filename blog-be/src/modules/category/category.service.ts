@@ -42,7 +42,7 @@ export class CategoryService {
     userId: string,
   ): Promise<Category> {
     try {
-      const category = await this.categoryRepository.findById(categoryId);
+      const category = await this.categoryRepository.findCategoryById(categoryId);
 
       if (!category) {
         throw new NotFoundException('Category not found');
@@ -87,7 +87,7 @@ export class CategoryService {
 
   async softDeleteCategory(categoryId: string, userId: string): Promise<Category> {
     try {
-      const category = await this.categoryRepository.findById(categoryId);
+      const category = await this.categoryRepository.findCategoryById(categoryId);
 
       if (!category) {
         throw new NotFoundException('Category not found');

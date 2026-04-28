@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client/extension';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreatePostDto } from './dto/post.dto';
 import { Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { ReaderPostFilter, ReaderPostItem, readerPostArgs } from '@/types/post-reader.type';
+import { UpdatePostDto } from './dto/post.dto';
+import { readerPostArgs, ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
 
 export class PrismaPostRepository implements IPostRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -62,7 +62,7 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async findPostById(postId: string): Promise<Post | null> {
-    return await this.prisma.post.findFirst({
+    return await this.prisma.post.findUnique({
       where: {
         id: postId,
         isDeleted: false,
@@ -128,9 +128,6 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.update({
       where: {
         id: postId,
-        userId: userId,
-        isDeleted: false,
-        isActive: true,
       },
       data: {
         title: data.title,
@@ -149,9 +146,6 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.update({
       where: {
         id: post_id,
-        userId: user_id,
-        isDeleted: false,
-        isActive: true,
       },
       data: {
         isDeleted: true,
@@ -162,11 +156,9 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async updateDraftStatus(userId: string, postId: string, isDraft: boolean): Promise<Post> {
-    const result = await this.prisma.post.updateMany({
+    const result = await this.prisma.post.update({
       where: {
         id: postId,
-        userId,
-        isDraft: !isDraft,
       },
       data: {
         isDraft,
@@ -174,9 +166,7 @@ export class PrismaPostRepository implements IPostRepository {
       },
     });
 
-    return await this.prisma.post.findUniqueOrThrow({
-      where: { id: postId },
-    });
+    return result;
   }
 
   async findPostByUserIdAndDraftStatus(
@@ -189,8 +179,6 @@ export class PrismaPostRepository implements IPostRepository {
       where: {
         userId,
         isDraft,
-        isDeleted: false,
-        isActive: true,
       },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
@@ -245,5 +233,14 @@ export class PrismaPostRepository implements IPostRepository {
     });
 
     return posts;
+  }
+
+  findCategoryById(categoryId: string): Promise<Post[]> {
+    return this.prisma.post.findMany({
+      where: {
+        categoryId,
+       
+      },
+    });
   }
 }

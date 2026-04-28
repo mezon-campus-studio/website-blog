@@ -20,7 +20,7 @@ export class PrismaCategoryRepository implements ICategoryRepository {
     });
   }
 
-  async findById(categoryId: string): Promise<Category | null> {
+  async findCategoryById(categoryId: string): Promise<Category | null> {
     return await this.prisma.category.findFirst({
       where: {
         id: categoryId,
