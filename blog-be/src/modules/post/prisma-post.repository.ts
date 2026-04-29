@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client/extension';
-import { CreatePostDto } from './dto/post.dto';
+import { CreatePostDto } from './post.dto';
 import { Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
-import { UpdatePostDto } from './dto/post.dto';
+import { UpdatePostDto } from './post.dto';
+import { gte } from 'zod/v4';
 
 export class PrismaPostRepository implements IPostRepository {
   constructor(private readonly prisma: PrismaClient) { }
@@ -99,21 +100,6 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
 
-  async findPostByCategoryId(page: number, limit: number, categoryId: string): Promise<Post[]> {
-    return await this.prisma.post.findMany({
-      where: {
-        categoryId: categoryId,
-        isDeleted: false,
-        isActive: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-  }
-
   async updatePost(
     data: Omit<UpdatePostDto, 'images'> & {
       slug: string;
@@ -177,7 +163,7 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.findMany({
       where: {
         userId,
-        isDraft,       
+        isDraft,
       },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
@@ -190,6 +176,26 @@ export class PrismaPostRepository implements IPostRepository {
       where: {
         categoryId: categoryId,
       },
+    });
+  }
+
+  async findPostByLikeCount(page: number, limit: number): Promise<Post[]> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate()-30);
+    return await this.prisma.post.findMany({
+      where: {
+        isDraft: false,
+        isDeleted: false,
+        isActive: true,
+        createdAt:{
+          gte: thirtyDaysAgo,
+        }
+      },
+      orderBy: {
+        likeCount: 'desc'
+      },
+      skip :(page-1) * limit,
+      take: limit,
     });
   }
 }

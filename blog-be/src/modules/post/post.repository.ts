@@ -1,6 +1,6 @@
-import { CreatePostDto } from './dto/post.dto';
+import { CreatePostDto } from './post.dto';
 import { Post } from '@prisma/client';
-import { UpdatePostDto } from './dto/post.dto';
+import { UpdatePostDto } from './post.dto';
 
 export interface IPostRepository {
   createPost(
@@ -40,14 +40,14 @@ export interface IPostRepository {
 
   findPostByUserId(page: number, limit: number, userId: string): Promise<Post[]>;
 
-  findPostByCategoryId(page: number, limit: number, categoryId: string): Promise<Post[]>;
-
   findPostByUserIdAndDraftStatus(
     pagr: number,
     limit: number,
     userId: string,
     isDraft: boolean,
   ): Promise<Post[]>;
-  
+
   findCategoryById(categoryId: string): Promise<Post[]>;
+
+  findPostByLikeCount(page: number, limit: number): Promise<Post[]>;
 }

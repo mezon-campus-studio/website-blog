@@ -1,7 +1,7 @@
 import { PostService } from './post.service';
-import { CreatePostDto } from './dto/post.dto';
+import { CreatePostDto } from './post.dto';
 import { NextFunction, Request, Response } from 'express';
-import { UpdatePostDto } from './dto/post.dto';
+import { UpdatePostDto } from './post.dto';
 
 export class PostController {
   constructor(private readonly postService: PostService) { }
@@ -75,17 +75,6 @@ export class PostController {
     });
   }
 
-  async getPostByCategoryId(req: Request, res: Response, next: NextFunction) {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const categoryId = req.params.category_id as string;
-    const posts = await this.postService.getPostByCategoryId(page, limit, categoryId);
-    res.status(200).json({
-      message: 'Posts fetched successfully',
-      data: posts,
-    });
-  }
-
   async deletePost(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
     const postId = req.params.post_id as string;
@@ -133,5 +122,15 @@ export class PostController {
       message: 'Post published fetched successfully',
       data: posts,
     });
+  }
+
+  async getHotsPost(req: Request, res: Response, _next: NextFunction){
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const posts = await this.postService.getHotsPost(page, limit);
+    res.status(200).json({
+      message: 'Posts fetch successfully',
+      data: posts
+    })
   }
 }

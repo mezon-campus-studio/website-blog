@@ -6,9 +6,9 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { passportAuthenticateJwt } from '@/config/passport.config';
 import { uploadImage } from '@/common/middleware/upload-image.middleware';
 import { validateDto } from '@/common/middleware/validate-dto.middleware';
-import { CreatePostDto } from '@/modules/post/dto/post.dto';
+import { CreatePostDto } from '@/modules/post/post.dto';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
-import { UpdatePostDto } from '@/modules/post/dto/post.dto';
+import { UpdatePostDto } from '@/modules/post/post.dto';
 
 const postRouter = Router();
 const postRepository = new PrismaPostRepository(prisma);
@@ -28,11 +28,6 @@ postRouter.post(
 postRouter.get('/', asyncHandler(postController.getAllPostPublished.bind(postController)));
 
 postRouter.get('/user/:user_id', asyncHandler(postController.getPostByUserId.bind(postController)));
-
-postRouter.get(
-  '/category/:category_id',
-  asyncHandler(postController.getPostByCategoryId.bind(postController)),
-);
 
 postRouter.put(
   '/:post_id',
@@ -74,6 +69,8 @@ postRouter.get(
   passportAuthenticateJwt,
   asyncHandler(postController.getPostPublishedByUserId.bind(postController)),
 );
+
+postRouter.get('/hot', asyncHandler(postController.getHotsPost.bind(postController)));
 
 postRouter.get('/:post_id', asyncHandler(postController.getPostById.bind(postController)));
 
