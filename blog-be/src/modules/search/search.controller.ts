@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { SearchService } from "./search.service";
+import { NextFunction, Request, Response } from 'express';
+import { SearchService } from './search.service';
 
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
@@ -25,10 +25,10 @@ export class SearchController {
     });
   }
 
-  async getPostByCategoryId(req: Request, res: Response, next: NextFunction) {
+  async getPostByCategoryId(req: Request, res: Response, _next: NextFunction) {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const categoryId = req.params.category_id as string;
+    const categoryId = req.params.categoryId as string;
     const posts = await this.searchService.searchPostByCategory(categoryId, page, limit);
     res.status(200).json({
       message: 'Posts fetched successfully',
