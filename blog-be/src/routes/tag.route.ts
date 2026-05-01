@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { ROLE } from '@prisma/client';
 import prisma from '@/lib/prisma';
 import { passportAuthenticateJwt } from '@/config/passport.config';
 import { authorize } from '@/common/middleware/authorize.middlerware';
@@ -19,33 +18,33 @@ tagRouter.use(passportAuthenticateJwt);
 
 tagRouter.post(
   '',
-  authorize(ROLE.ADMIN, ROLE.USER),
+  authorize('ADMIN', 'USER'),
   validateDto(CreateTagDto),
   asyncHandler(tagController.createTag.bind(tagController)),
 );
 
 tagRouter.get(
   '/all',
-  authorize(ROLE.ADMIN, ROLE.USER),
+  authorize('ADMIN', 'USER'),
   asyncHandler(tagController.getAllTags.bind(tagController)),
 );
 
 tagRouter.get(
   '/:tag_id',
-  authorize(ROLE.ADMIN, ROLE.USER),
+  authorize('ADMIN', 'USER'),
   asyncHandler(tagController.getTagById.bind(tagController)),
 );
 
 tagRouter.put(
   '/:tag_id',
-  authorize(ROLE.ADMIN, ROLE.USER),
+  authorize('ADMIN', 'USER'),
   validateDto(UpdateTagDto),
   asyncHandler(tagController.updateTag.bind(tagController)),
 );
 
 tagRouter.delete(
   '/:tag_id',
-  authorize(ROLE.ADMIN, ROLE.USER),
+  authorize('ADMIN', 'USER'),
   asyncHandler(tagController.softDeleteTag.bind(tagController)),
 );
 

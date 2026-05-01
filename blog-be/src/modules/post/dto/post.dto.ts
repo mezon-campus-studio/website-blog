@@ -70,9 +70,10 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   categoryId?: string;
+}
 
-  @IsOptional()
+export class AttachTagsDto {
   @IsArray()
-  @Transform(({ value }) => normalizeStringArray(value))
-  tagIds?: string[];
+  @IsString({ each: true })
+  tagIds!: string[];
 }

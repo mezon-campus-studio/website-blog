@@ -51,6 +51,12 @@ export interface IPostRepository {
   ): Promise<Post[]>;
 
   findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]>;
-  
+
   findCategoryById(categoryId: string): Promise<Category | null>;
+
+  attachTagsToPost(userId: string, postId: string, tagIds: string[]): Promise<void>;
+
+  detachTagFromPost(postId: string, tagId: string): Promise<void>;
+
+  findTagsByPostId(postId: string): Promise<string[]>;
 }

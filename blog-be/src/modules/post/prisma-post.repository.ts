@@ -230,4 +230,66 @@ export class PrismaPostRepository implements IPostRepository {
       },
     });
   }
+
+  async attachTagsToPost(userId: string, postId: string, tagIds: string[]): Promise<void> {
+    tagIds = [...new Set(tagIds)];
+
+    const existing = await this.prisma.postTag.findMany({
+      where: { postId, isDeleted: false },
+    });
+
+    const existingIds = existing.map((t: { tagId: string }) => t.tagId);
+
+    const toAdd = tagIds.filter((id) => !existingIds.includes(id));
+    const toRemove = existingIds.filter((id: string) => !tagIds.includes(id));
+
+    return await this.prisma.$transaction([
+      // thêm
+      this.prisma.post.update({
+        where: { id: postId },
+        data: {
+          tags: {
+            create: toAdd.map((tagId) => ({
+              tag: { connect: { id: tagId } },
+              createdBy: userId,
+            })),
+          },
+        },
+      }),
+
+      // xóa
+      this.prisma.postTag.deleteMany({
+        where: {
+          postId,
+          tagId: { in: toRemove },
+        },
+      }),
+    ]);
+  }
+
+  async detachTagFromPost(postId: string, tagId: string): Promise<void> {
+    return await this.prisma.postTag.delete({
+      where: {
+        postId_tagId: {
+          postId,
+          tagId,
+        },
+      },
+    });
+  }
+
+  async findTagsByPostId(postId: string): Promise<string[]> {
+    return await this.prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+    });
+  }
 }

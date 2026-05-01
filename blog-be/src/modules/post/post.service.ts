@@ -287,8 +287,6 @@ export class PostService {
   }
 
   async getReaderPostsByTagId(page: number, limit: number, tagId: string) {
-    
-
     return await this.postRepository.findReaderPosts({
       page,
       limit,
@@ -297,11 +295,22 @@ export class PostService {
   }
 
   async getReaderPostsByCategorySlug(page: number, limit: number, categorySlug: string) {
-
     return await this.postRepository.findReaderPosts({
       page,
       limit,
       categorySlug,
     });
+  }
+
+  async attachTagsToPost(userId: string, postId: string, tagIds: string[]) {
+    return await this.postRepository.attachTagsToPost(userId, postId, tagIds);
+  }
+
+  async detachTagFromPost(postId: string, tagId: string) {
+    return await this.postRepository.detachTagFromPost(postId, tagId);
+  }
+
+  async getTagsByPostId(postId: string) {
+    return await this.postRepository.findTagsByPostId(postId);
   }
 }
