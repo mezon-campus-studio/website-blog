@@ -13,9 +13,6 @@ export class TagService {
   async createTag(data: CreateTagDto, userId: string): Promise<Tag> {
     try {
       const name = this.normalizeName(data.name);
-      if (!name) {
-        throw new BadRequestException('Tag name is required');
-      }
 
       const existingTag = await this.tagRepository.findByName(name);
       if (existingTag && !existingTag.isDeleted) {
@@ -33,24 +30,16 @@ export class TagService {
   }
 
   async getAllTags(): Promise<Tag[]> {
-    try {
-      return await this.tagRepository.findAllTags();
-    } catch (error) {
-      throw error;
-    }
+    return await this.tagRepository.findAllTags();
   }
 
   async getTagById(tagId: string): Promise<Tag> {
-    try {
-      const tag = await this.tagRepository.findById(tagId);
-      if (!tag) {
-        throw new NotFoundException('Tag not found');
-      }
-
-      return tag;
-    } catch (error) {
-      throw error;
+    const tag = await this.tagRepository.findById(tagId);
+    if (!tag) {
+      throw new NotFoundException('Tag not found');
     }
+
+    return tag;
   }
 
   async updateTag(tagId: string, data: UpdateTagDto, userId: string): Promise<Tag> {
@@ -64,19 +53,14 @@ export class TagService {
         ...data,
       };
 
-      if (updatePayload.name !== undefined) {
-        const name = this.normalizeName(updatePayload.name);
-        if (!name) {
-          throw new BadRequestException('Tag name is required');
-        }
+      const name = this.normalizeName(updatePayload.name);
 
-        const existingTag = await this.tagRepository.findByName(name);
-        if (existingTag && existingTag.id !== tagId && !existingTag.isDeleted) {
-          throw new BadRequestException('Tag already exists');
-        }
-
-        updatePayload.name = name;
+      const existingTag = await this.tagRepository.findByName(name);
+      if (existingTag && existingTag.id !== tagId && !existingTag.isDeleted) {
+        throw new BadRequestException('Tag already exists');
       }
+
+      updatePayload.name = name;
 
       return await this.tagRepository.updateTag(tagId, updatePayload, userId);
     } catch (error) {
@@ -85,15 +69,6 @@ export class TagService {
   }
 
   async softDeleteTag(tagId: string, userId: string): Promise<Tag> {
-    try {
-      const tag = await this.tagRepository.findById(tagId);
-      if (!tag) {
-        throw new NotFoundException('Tag not found');
-      }
-
-      return await this.tagRepository.softDeleteTag(tagId, userId);
-    } catch (error) {
-      throw error;
-    }
+    return await this.tagRepository.softDeleteTag(tagId, userId);
   }
 }

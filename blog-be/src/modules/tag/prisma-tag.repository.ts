@@ -16,11 +16,9 @@ export class PrismaTagRepository implements ITagRepository {
   }
 
   async findById(tagId: string): Promise<Tag | null> {
-    return await this.prisma.tag.findFirst({
+    return await this.prisma.tag.findUnique({
       where: {
         id: tagId,
-        isDeleted: false,
-        isActive: true,
       },
     });
   }
@@ -34,7 +32,7 @@ export class PrismaTagRepository implements ITagRepository {
   async findAllTags(): Promise<Tag[]> {
     return await this.prisma.tag.findMany({
       orderBy: {
-        createdAt: 'desc',
+        name: 'desc',
       },
     });
   }
@@ -54,7 +52,8 @@ export class PrismaTagRepository implements ITagRepository {
     return await this.prisma.tag.update({
       where: { id: tagId },
       data: {
-        ...(data.name !== undefined ? { name: data.name } : {}),
+        name: data.name,
+        updatedAt: new Date(),
         updatedBy: userId,
       },
     });
@@ -67,6 +66,7 @@ export class PrismaTagRepository implements ITagRepository {
         isDeleted: true,
         isActive: false,
         updatedBy: userId,
+        updatedAt: new Date(),
       },
     });
   }

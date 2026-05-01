@@ -187,29 +187,18 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]> {
-    const where: any = {
-      isDeleted: false,
-      isActive: true,
-      isDraft: false,
-      category: {
-        isDeleted: false,
-        isActive: true,
-      },
-    };
+    const where: any = {};
 
-    if (filter.categoryId) {
-      where.categoryId = filter.categoryId;
-    }
+    filter.categoryId && (where.categoryId = filter.categoryId);
 
-    if (filter.categorySlug) {
-      where.category = {
-        ...where.category,
+    filter.categorySlug &&
+      (where.category = {
+        ...(where.category || {}),
         slug: filter.categorySlug,
-      };
-    }
+      });
 
-    if (filter.tagId) {
-      where.tags = {
+    filter.tagId &&
+      (where.tags = {
         some: {
           tagId: filter.tagId,
           isDeleted: false,
@@ -219,8 +208,7 @@ export class PrismaPostRepository implements IPostRepository {
             isActive: true,
           },
         },
-      };
-    }
+      });
 
     const posts = await this.prisma.post.findMany({
       where,

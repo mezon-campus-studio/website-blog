@@ -13,5 +13,5 @@ export class UpdateTagDto {
   @IsString()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   @IsNotEmpty()
-  name?: string;
+  name!: string;
 }

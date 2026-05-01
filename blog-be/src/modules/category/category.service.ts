@@ -52,32 +52,17 @@ export class CategoryService {
         ...data,
       };
 
-      if (updatePayload.name !== undefined) {
-        const name = updatePayload.name.trim();
+      const normalizedSlug = data.name;
 
-        if (!name) {
-          throw new BadRequestException('Category name is required');
-        }
+      const existingCategory = await this.categoryRepository.findBySlug(normalizedSlug);
 
-        const normalizedSlug = normalizeSlug(name);
-
-        if (!normalizedSlug) {
-          throw new BadRequestException('Category name is invalid to generate slug');
-        }
-
-        const existingCategory = await this.categoryRepository.findBySlug(normalizedSlug);
-
-        if (existingCategory && existingCategory.id !== categoryId) {
-          throw new BadRequestException('Category slug already exists');
-        }
-
-        updatePayload.name = name;
-        updatePayload.slug = normalizedSlug;
+      if (existingCategory && existingCategory.id !== categoryId) {
+        throw new BadRequestException('Category slug already exists');
       }
 
-      if (updatePayload.description !== undefined) {
-        updatePayload.description = updatePayload.description.trim();
-      }
+      updatePayload.name = data.name.trim();
+      updatePayload.slug = normalizedSlug;
+      updatePayload.description = updatePayload.description?.trim();
 
       return await this.categoryRepository.updateCategory(categoryId, updatePayload, userId);
     } catch (error) {
@@ -100,22 +85,14 @@ export class CategoryService {
   }
 
   async getAllCategories(): Promise<Category[]> {
-    try {
-      return await this.categoryRepository.getAllCategories();
-    } catch (error) {
-      throw error;
-    }
+    return await this.categoryRepository.getAllCategories();
   }
 
   async getCategoryBySlug(slug: string): Promise<Category> {
-    try {
-      const category = await this.categoryRepository.findBySlug(slug);
-      if (!category) {
-        throw new NotFoundException('Category not found');
-      }
-      return category;
-    } catch (error) {
-      throw error;
+    const category = await this.categoryRepository.findBySlug(slug);
+    if (!category) {
+      throw new NotFoundException('Category not found');
     }
+    return category;
   }
 }

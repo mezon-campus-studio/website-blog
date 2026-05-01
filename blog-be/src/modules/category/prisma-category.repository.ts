@@ -44,9 +44,7 @@ export class PrismaCategoryRepository implements ICategoryRepository {
     return await this.prisma.category.update({
       where: { id: categoryId },
       data: {
-        ...(data.name !== undefined ? { name: data.name } : {}),
-        ...(data.description !== undefined ? { description: data.description } : {}),
-        ...(data.slug !== undefined ? { slug: data.slug } : {}),
+        ...data,
         updatedBy: userId,
       },
     });

@@ -287,9 +287,7 @@ export class PostService {
   }
 
   async getReaderPostsByTagId(page: number, limit: number, tagId: string) {
-    if (!tagId) {
-      throw new BadRequestException('Tag id is required');
-    }
+    
 
     return await this.postRepository.findReaderPosts({
       page,
@@ -299,9 +297,6 @@ export class PostService {
   }
 
   async getReaderPostsByCategorySlug(page: number, limit: number, categorySlug: string) {
-    if (!categorySlug) {
-      throw new BadRequestException('Category slug is required');
-    }
 
     return await this.postRepository.findReaderPosts({
       page,

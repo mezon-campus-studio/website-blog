@@ -17,8 +17,7 @@ export class UpdateCategoryDto {
   @IsOptional()
   @IsString()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  @IsNotEmpty()
-  name?: string;
+  name!: string;
 
   @IsOptional()
   @IsString()
