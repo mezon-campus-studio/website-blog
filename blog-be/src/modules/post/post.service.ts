@@ -2,13 +2,17 @@ import { IPostRepository } from './post.repository';
 import { CreatePostDto } from './dto/post.dto';
 import { Post } from '@prisma/client';
 import slugify from 'slugify';
-import { deleteImageFromCloudinary, FolderType, uploadToCloudinary } from '@/common/utils/cloudinary';
+import {
+  deleteImageFromCloudinary,
+  FolderType,
+  uploadToCloudinary,
+} from '@/common/utils/cloudinary';
 import { UpdatePostDto } from './dto/post.dto';
 import { BadRequestException } from '@/common/utils/app-error';
 import { Env } from '@/config/env.config';
 
 export class PostService {
-  constructor(private readonly postRepository: IPostRepository) { }
+  constructor(private readonly postRepository: IPostRepository) {}
 
   async createPost(
     data: CreatePostDto,
@@ -68,7 +72,11 @@ export class PostService {
 
       if (imageFiles?.length) {
         for (const file of imageFiles) {
-          const uploadedImage = await uploadToCloudinary(file.buffer, file.originalname, FolderType.IMAGES);
+          const uploadedImage = await uploadToCloudinary(
+            file.buffer,
+            file.originalname,
+            FolderType.IMAGES,
+          );
           if (!uploadedImage?.secureUrl || !uploadedImage?.publicId) {
             throw new BadRequestException('Failed to upload image');
           }
@@ -185,7 +193,11 @@ export class PostService {
       if (imageFiles?.length) {
         images = [];
         for (const file of imageFiles) {
-          const uploadedImage = await uploadToCloudinary(file.buffer, file.originalname, FolderType.IMAGES);
+          const uploadedImage = await uploadToCloudinary(
+            file.buffer,
+            file.originalname,
+            FolderType.IMAGES,
+          );
           if (!uploadedImage?.secureUrl || !uploadedImage?.publicId) {
             throw new BadRequestException('Failed to upload image');
           }
@@ -220,7 +232,6 @@ export class PostService {
       }
 
       return result;
-
     } catch (error) {
       if (uploadedThumbnail?.publicId) {
         await deleteImageFromCloudinary(uploadedThumbnail.publicId);
@@ -264,5 +275,42 @@ export class PostService {
     isDraft: boolean,
   ): Promise<Post[]> {
     return await this.postRepository.findPostByUserIdAndDraftStatus(page, limit, userId, isDraft);
+  }
+
+  async getReaderPosts(page: number, limit: number, categoryId?: string, tagId?: string) {
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      categoryId,
+      tagId,
+    });
+  }
+
+  async getReaderPostsByTagId(page: number, limit: number, tagId: string) {
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      tagId,
+    });
+  }
+
+  async getReaderPostsByCategorySlug(page: number, limit: number, categorySlug: string) {
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      categorySlug,
+    });
+  }
+
+  async attachTagsToPost(userId: string, postId: string, tagIds: string[]) {
+    return await this.postRepository.attachTagsToPost(userId, postId, tagIds);
+  }
+
+  async detachTagFromPost(postId: string, tagId: string) {
+    return await this.postRepository.detachTagFromPost(postId, tagId);
+  }
+
+  async getTagsByPostId(postId: string) {
+    return await this.postRepository.findTagsByPostId(postId);
   }
 }
