@@ -6,9 +6,9 @@ import { Router } from 'express';
 import { passportAuthenticateJwt } from '@/config/passport.config';
 import { uploadImage } from '@/common/middleware/upload-image.middleware';
 import { validateDto } from '@/common/middleware/validate-dto.middleware';
-import { AttachTagsDto, CreatePostDto } from '@/modules/post/dto/post.dto';
+import { AttachTagsDto, CreatePostDto } from '@/modules/post/post.dto';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
-import { UpdatePostDto } from '@/modules/post/dto/post.dto';
+import { UpdatePostDto } from '@/modules/post/post.dto';
 import { authorize } from '@/common/middleware/authorize.middlerware';
 
 const postRouter = Router();
@@ -33,11 +33,6 @@ postRouter.get('/', asyncHandler(postController.getAllPostPublished.bind(postCon
 
 postRouter.get('/user/:user_id', asyncHandler(postController.getPostByUserId.bind(postController)));
 
-postRouter.get(
-  '/category/:category_id',
-  asyncHandler(postController.getPostByCategoryId.bind(postController)),
-);
-
 postRouter.get('/reader', asyncHandler(postController.getReaderPosts.bind(postController)));
 
 postRouter.get(
@@ -60,10 +55,7 @@ postRouter.put(
   asyncHandler(postController.updatePost.bind(postController)),
 );
 
-postRouter.delete(
-  '/:postId',
-  asyncHandler(postController.deletePost.bind(postController)),
-);
+postRouter.delete('/:postId', asyncHandler(postController.deletePost.bind(postController)));
 
 postRouter.patch(
   '/:postId/draft',
@@ -84,6 +76,9 @@ postRouter.get(
   asyncHandler(postController.getPostPublishedByUserId.bind(postController)),
 );
 
+postRouter.get('/hot', asyncHandler(postController.getHotsPost.bind(postController)));
+
+postRouter.get('/:post_id', asyncHandler(postController.getPostById.bind(postController)));
 postRouter.post(
   '/:postId/tags',
   authorize('ADMIN', 'USER'),

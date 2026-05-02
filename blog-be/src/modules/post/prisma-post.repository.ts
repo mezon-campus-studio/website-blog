@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client/extension';
-import { CreatePostDto } from './dto/post.dto';
+import { CreatePostDto } from './post.dto';
 import { Category, Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
-import { UpdatePostDto } from './dto/post.dto';
+import { UpdatePostDto } from './post.dto';
 import { readerPostArgs, ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
 
 export class PrismaPostRepository implements IPostRepository {
@@ -89,21 +89,6 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.findMany({
       where: {
         userId: userId,
-        isDeleted: false,
-        isActive: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      skip: (page - 1) * limit,
-      take: limit,
-    });
-  }
-
-  async findPostByCategoryId(page: number, limit: number, categoryId: string): Promise<Post[]> {
-    return await this.prisma.post.findMany({
-      where: {
-        categoryId: categoryId,
         isDeleted: false,
         isActive: true,
       },
@@ -290,6 +275,26 @@ export class PrismaPostRepository implements IPostRepository {
           },
         },
       },
+    });
+  }
+
+  async findPostByLikeCount(page: number, limit: number): Promise<Post[]> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate()-30);
+    return await this.prisma.post.findMany({
+      where: {
+        isDraft: false,
+        isDeleted: false,
+        isActive: true,
+        createdAt:{
+          gte: thirtyDaysAgo,
+        }
+      },
+      orderBy: {
+        likeCount: 'desc'
+      },
+      skip :(page-1) * limit,
+      take: limit,
     });
   }
 }

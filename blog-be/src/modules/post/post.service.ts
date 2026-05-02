@@ -1,5 +1,5 @@
 import { IPostRepository } from './post.repository';
-import { CreatePostDto } from './dto/post.dto';
+import { CreatePostDto } from './post.dto';
 import { Post } from '@prisma/client';
 import slugify from 'slugify';
 import {
@@ -7,7 +7,7 @@ import {
   FolderType,
   uploadToCloudinary,
 } from '@/common/utils/cloudinary';
-import { UpdatePostDto } from './dto/post.dto';
+import { UpdatePostDto } from './post.dto';
 import { BadRequestException } from '@/common/utils/app-error';
 import { Env } from '@/config/env.config';
 
@@ -125,10 +125,6 @@ export class PostService {
 
   async getPostByUserId(page: number, limit: number, userId: string): Promise<Post[]> {
     return await this.postRepository.findPostByUserId(page, limit, userId);
-  }
-
-  async getPostByCategoryId(page: number, limit: number, categoryId: string): Promise<Post[]> {
-    return await this.postRepository.findPostByCategoryId(page, limit, categoryId);
   }
 
   async updatePost(
@@ -277,6 +273,9 @@ export class PostService {
     return await this.postRepository.findPostByUserIdAndDraftStatus(page, limit, userId, isDraft);
   }
 
+  async getHotsPost(page: number, limit: number): Promise<Post[]> {
+    return await this.postRepository.findPostByLikeCount(page, limit);
+  }
   async getReaderPosts(page: number, limit: number, categoryId?: string, tagId?: string) {
     return await this.postRepository.findReaderPosts({
       page,
