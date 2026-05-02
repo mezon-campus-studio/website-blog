@@ -1,12 +1,12 @@
 import { PrismaClient } from '@prisma/client/extension';
 import { CreatePostDto } from './post.dto';
-import { Post } from '@prisma/client';
+import { Category, Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
 import { UpdatePostDto } from './post.dto';
-import { gte } from 'zod/v4';
+import { readerPostArgs, ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
 
 export class PrismaPostRepository implements IPostRepository {
-  constructor(private readonly prisma: PrismaClient) { }
+  constructor(private readonly prisma: PrismaClient) {}
 
   async findBySlug(slug: string): Promise<Post | null> {
     return await this.prisma.post.findUnique({
@@ -171,10 +171,109 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
 
-  async findCategoryById(categoryId: string): Promise<Post[]> {
+  async findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]> {
+    const where: any = {};
+
+    filter.categoryId && (where.categoryId = filter.categoryId);
+
+    filter.categorySlug &&
+      (where.category = {
+        ...(where.category || {}),
+        slug: filter.categorySlug,
+      });
+
+    filter.tagId &&
+      (where.tags = {
+        some: {
+          tagId: filter.tagId,
+          isDeleted: false,
+          isActive: true,
+          tag: {
+            isDeleted: false,
+            isActive: true,
+          },
+        },
+      });
+
+    const posts = await this.prisma.post.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (filter.page - 1) * filter.limit,
+      take: filter.limit,
+      ...readerPostArgs,
+    });
+
+    return posts;
+  }
+
+  async findCategoryById(categoryId: string): Promise<Category> {
     return await this.prisma.post.findMany({
       where: {
-        categoryId: categoryId,
+        categoryId,
+      },
+    });
+  }
+
+  async attachTagsToPost(userId: string, postId: string, tagIds: string[]): Promise<void> {
+    tagIds = [...new Set(tagIds)];
+
+    const existing = await this.prisma.postTag.findMany({
+      where: { postId, isDeleted: false },
+    });
+
+    const existingIds = existing.map((t: { tagId: string }) => t.tagId);
+
+    const toAdd = tagIds.filter((id) => !existingIds.includes(id));
+    const toRemove = existingIds.filter((id: string) => !tagIds.includes(id));
+
+    return await this.prisma.$transaction([
+      // thêm
+      this.prisma.post.update({
+        where: { id: postId },
+        data: {
+          tags: {
+            create: toAdd.map((tagId) => ({
+              tag: { connect: { id: tagId } },
+              createdBy: userId,
+            })),
+          },
+        },
+      }),
+
+      // xóa
+      this.prisma.postTag.deleteMany({
+        where: {
+          postId,
+          tagId: { in: toRemove },
+        },
+      }),
+    ]);
+  }
+
+  async detachTagFromPost(postId: string, tagId: string): Promise<void> {
+    return await this.prisma.postTag.delete({
+      where: {
+        postId_tagId: {
+          postId,
+          tagId,
+        },
+      },
+    });
+  }
+
+  async findTagsByPostId(postId: string): Promise<string[]> {
+    return await this.prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      include: {
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
   }

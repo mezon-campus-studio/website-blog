@@ -1,6 +1,5 @@
-import { PublicUser, UpdateProfileDto } from './user.dto';
-
-
+import { PublicUser } from '@/types/user.type';
+import { UpdateProfileDto } from './user.dto';
 
 export interface IUserRepository {
   findUserActiveById(userId: string): Promise<PublicUser | null>;
