@@ -30,13 +30,23 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center px-4">
-        <div className="w-full max-w-md text-center space-y-4 p-8 bg-card-bg/30 backdrop-blur-md rounded-2xl border border-card-border shadow-2xl mx-auto">
-          <AlertCircle className="mx-auto text-destructive" size={64} />
-          <h2 className="text-2xl font-bold">Story not found</h2>
-          <p className="text-muted-foreground italic">Maybe it was un-published or the link is broken.</p>
-          <Button variant="primary" onClick={() => router.push('/')} className="mt-4">
-            Back to Home
+      <div className="flex flex-col items-center justify-center min-h-[80vh] w-full px-6 py-20">
+        <div className="flex flex-col items-center text-center space-y-6 p-10 bg-card-bg/50 backdrop-blur-xl rounded-3xl border border-card-border shadow-2xl w-full max-w-lg">
+          <div className="bg-destructive/10 p-4 rounded-full">
+            <AlertCircle className="text-destructive" size={48} />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black tracking-tight">Story not found</h2>
+            <p className="text-muted-foreground text-lg italic max-w-sm mx-auto">
+              Maybe it was un-published or the link is broken.
+            </p>
+          </div>
+          <Button 
+            variant="primary" 
+            onClick={() => router.push('/')} 
+            className="px-8 h-12 text-base font-bold rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:-translate-y-1"
+          >
+            Back to Home Feed
           </Button>
         </div>
       </div>
