@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client/extension';
 import { CreatePostDto } from './post.dto';
 import { Category, Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
@@ -62,7 +62,7 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async findPostById(postId: string): Promise<Post | null> {
-    return await this.prisma.post.findFirst({
+    return await this.prisma.post.findUnique({
       where: {
         id: postId,
         isDeleted: false,
@@ -208,10 +208,10 @@ export class PrismaPostRepository implements IPostRepository {
     return posts;
   }
 
-  async findCategoryById(categoryId: string): Promise<Category | null> {
-    return await this.prisma.category.findUnique({
+  async findCategoryById(categoryId: string): Promise<Category> {
+    return await this.prisma.post.findMany({
       where: {
-        id: categoryId,
+        categoryId,
       },
     });
   }
@@ -263,8 +263,8 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
 
-  async findTagsByPostId(postId: string): Promise<any> {
-    const post = await this.prisma.post.findUnique({
+  async findTagsByPostId(postId: string): Promise<string[]> {
+    return await this.prisma.post.findUnique({
       where: {
         id: postId,
       },
@@ -276,7 +276,6 @@ export class PrismaPostRepository implements IPostRepository {
         },
       },
     });
-    return post?.tags.map((t: any) => t.tag) || [];
   }
 
   async findPostByLikeCount(page: number, limit: number): Promise<Post[]> {
