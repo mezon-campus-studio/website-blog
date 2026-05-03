@@ -11,33 +11,35 @@ interface CreateUserDto {
 
 export function useCreateUser() {
   const queryClient = useQueryClient();
-  const { token: currentToken } = useAuthStore.getState();
 
   return useMutation({
     mutationFn: async (dto: CreateUserDto) => {
-      console.log('🛠 [useCreateUser] Current Admin Token:', currentToken ? 'Present' : 'MISSING');
+      // CAPTURE current admin session BEFORE it gets overwritten or cleared
+      const adminUser = useAuthStore.getState().user;
+      const adminToken = useAuthStore.getState().token;
+
+      console.log('🛠 [useCreateUser] Attempting to create user while preserving Admin:', adminUser?.name);
       
-      // For now, we use /auth/register but we might want a dedicated admin endpoint later
-      // NOTE: We don't use useSignup here to avoid auto-logging into the new account
       const signUpData = {
         ...dto,
         confirmPassword: dto.password,
       };
-      const { data } = await apiClient.post<{ user: User }>('/auth/register', signUpData);
-      
-      // RESTORE Admin Session if it was lost/overwritten by the registration call
-      if (currentToken) {
-        const { user } = useAuthStore.getState();
-        if (user) {
-          useAuthStore.getState().setAuth(user, currentToken);
+
+      try {
+        const { data } = await apiClient.post<{ user: User }>('/auth/register', signUpData);
+        return data;
+      } finally {
+        // ALWAYS RESTORE Admin Session regardless of success/failure
+        // This prevents the admin from being logged out by the backend's Set-Cookie header
+        if (adminUser && adminToken) {
+          console.log('✅ [useCreateUser] Force-restoring Admin session for:', adminUser.name);
+          useAuthStore.getState().setAuth(adminUser, adminToken);
+          
           if (typeof window !== 'undefined') {
-            localStorage.setItem('token', currentToken);
+            localStorage.setItem('token', adminToken);
           }
-          console.log('✅ [useCreateUser] Admin session restored successfully');
         }
       }
-
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });

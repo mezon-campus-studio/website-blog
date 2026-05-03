@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { usePostBySlug } from '@/features/posts/hooks/usePostActions';
+import { usePost } from '@/features/posts/hooks/usePostActions';
 import { Button } from '@/components/ui';
 import { Loader2, AlertCircle, Calendar, Clock, User, ChevronLeft, Share2 } from 'lucide-react';
 import Image from 'next/image';
@@ -10,17 +10,17 @@ import Link from 'next/link';
 
 export default function PostDetailPage() {
   const params = useParams();
-  const slug = params.slug as string;
+  const id = params.id as string;
   const router = useRouter();
 
-  const { data: post, isLoading, error } = usePostBySlug(slug);
+  const { data: post, isLoading, error } = usePost(id);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
+      <div className="min-h-screen w-full flex items-center justify-center px-4">
+        <div className="w-full flex flex-col items-center gap-4">
           <Loader2 className="animate-spin text-primary" size={48} />
-          <p className="text-muted-foreground font-bold uppercase tracking-widest animate-pulse">
+          <p className="text-muted-foreground font-bold uppercase tracking-widest animate-pulse text-center">
             Unfolding the Story...
           </p>
         </div>
@@ -30,8 +30,8 @@ export default function PostDetailPage() {
 
   if (error || !post) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4 p-8 bg-card-bg/30 backdrop-blur-md rounded-2xl border border-card-border shadow-2xl max-w-md mx-4">
+      <div className="min-h-screen w-full flex items-center justify-center px-4">
+        <div className="w-full max-w-md text-center space-y-4 p-8 bg-card-bg/30 backdrop-blur-md rounded-2xl border border-card-border shadow-2xl mx-auto">
           <AlertCircle className="mx-auto text-destructive" size={64} />
           <h2 className="text-2xl font-bold">Story not found</h2>
           <p className="text-muted-foreground italic">Maybe it was un-published or the link is broken.</p>

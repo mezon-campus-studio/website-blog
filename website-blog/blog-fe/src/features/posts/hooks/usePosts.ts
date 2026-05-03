@@ -69,3 +69,13 @@ export function useAllPosts() {
     },
   });
 }
+
+export function useHottestPosts() {
+  return useQuery<Post[], Error>({
+    queryKey: ['posts', 'hottest'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ data: Post[] }>('/post/hot');
+      return data.data || [];
+    },
+  });
+}

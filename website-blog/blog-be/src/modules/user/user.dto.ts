@@ -1,4 +1,3 @@
-import { Prisma } from '@prisma/client';
 import { IsOptional, IsString, Length } from 'class-validator';
 
 export class ChangePasswordDto {
@@ -27,22 +26,3 @@ export class UpdateProfileDto {
   bio?: string;
 }
 
-export const publicUserArgs = Prisma.validator<Prisma.UserDefaultArgs>()({
-  select: {
-    id: true,
-    email: true,
-    name: true,
-    avatar_url: true,
-    bio: true,
-    role: true,
-    createdAt: true,
-    updatedAt: true,
-    createdBy: true,
-    updatedBy: true,
-    isActive: true,
-    isDeleted: true,
-    lastLoginAt: true,
-  },
-});
-
-export type PublicUser = Prisma.UserGetPayload<typeof publicUserArgs>;

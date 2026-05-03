@@ -7,11 +7,27 @@ export const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Helper to check if a route is public
+const isPublicRoute = (url: string = '') => {
+  const publicPaths = [
+    '/auth/login',
+    '/auth/register',
+    '/post',
+    '/post/hot',
+    '/category',
+    '/tag',
+    '/search'
+  ];
+  // Check if the URL starts with any of the public paths
+  // We use includes or startsWith depending on how specific we want to be
+  return publicPaths.some(path => url.includes(path));
+};
+
 // Add a request interceptor to attach the JWT token
 apiClient.interceptors.request.use(
   (config) => {
-    // Avoid logging token warnings for public auth routes
-    const isPublicAuthRoute = config.url?.includes('/auth/login') || config.url?.includes('/auth/register');
+    const url = config.url || '';
+    const isPublic = isPublicRoute(url);
 
     // Get token from store first, fallback to localStorage
     let token = useAuthStore.getState().token;
@@ -22,8 +38,8 @@ apiClient.interceptors.request.use(
 
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
-    } else if (!isPublicAuthRoute) {
-      console.warn(`[API Request] NO TOKEN found for ${config.url}`);
+    } else if (!isPublic) {
+      console.warn(`[API Request] NO TOKEN found for ${url}`);
     }
 
     return config;
@@ -37,7 +53,7 @@ apiClient.interceptors.response.use(
   (error) => {
     const status = error.response?.status;
     const url = error.config?.url || '';
-    const isPublicAuthRoute = url.includes('/auth/login') || url.includes('/auth/register');
+    const isPublic = isPublicRoute(url);
 
     // Log detailed error info for debugging
     if (error.response) {
@@ -45,7 +61,8 @@ apiClient.interceptors.response.use(
       console.error('Data:', error.response.data);
     }
 
-    if (status === 401 && !isPublicAuthRoute) {
+    // Only clear session for 401 on protected routes
+    if (status === 401 && !isPublic) {
       console.error('🚨 Session expired or unauthorized. Clearing session...');
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');

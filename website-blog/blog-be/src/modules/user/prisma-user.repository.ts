@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { IUserRepository } from './user.repository';
-import { PublicUser, publicUserArgs, UpdateProfileDto } from './user.dto';
+import { UpdateProfileDto } from './user.dto';
+import { PublicUser, publicUserArgs } from '@/types/user.type';
 
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaClient) {}
