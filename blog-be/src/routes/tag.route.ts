@@ -18,7 +18,7 @@ tagRouter.use(passportAuthenticateJwt);
 
 tagRouter.post(
   '',
-  authorize('ADMIN', 'USER'),
+  authorize('ADMIN'),
   validateDto(CreateTagDto),
   asyncHandler(tagController.createTag.bind(tagController)),
 );
@@ -37,14 +37,14 @@ tagRouter.get(
 
 tagRouter.put(
   '/:tag_id',
-  authorize('ADMIN', 'USER'),
+  authorize('ADMIN'),
   validateDto(UpdateTagDto),
   asyncHandler(tagController.updateTag.bind(tagController)),
 );
 
 tagRouter.delete(
   '/:tag_id',
-  authorize('ADMIN', 'USER'),
+  authorize('ADMIN'),
   asyncHandler(tagController.softDeleteTag.bind(tagController)),
 );
 
