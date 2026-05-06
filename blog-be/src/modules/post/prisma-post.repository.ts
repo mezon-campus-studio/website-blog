@@ -62,7 +62,7 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async findPostById(postId: string): Promise<Post | null> {
-    return await this.prisma.post.findFirst({
+    return await this.prisma.post.findUnique({
       where: {
         id: postId,
         isDeleted: false,
@@ -213,8 +213,8 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.category.findFirst({
       where: {
         id: categoryId,
-        isDeleted: false,
         isActive: true,
+        isDeleted: false,
       },
     });
   }
