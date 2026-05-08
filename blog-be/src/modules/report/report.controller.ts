@@ -56,16 +56,6 @@ export class ReportController {
       data: result,
     });
   }
-  async getAllReport(req: Request, res: Response, _next: NextFunction) {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const result = await this.reportService.getAllReport(page, limit);
-
-    return res.status(200).json({
-      message: 'Fetch report successfully',
-      data: result,
-    });
-  }
 
   async getReportByStatus(req: Request, res: Response, _next: NextFunction) {
     const status = req.query.status as ReportStatus;

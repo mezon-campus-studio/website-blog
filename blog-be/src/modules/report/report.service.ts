@@ -12,9 +12,6 @@ export class ReportService {
       if (!post) {
         throw new BadRequestException('Post not found');
       }
-      if (post?.userId === userId) {
-        throw new BadRequestException('Cannot report your own post');
-      }
       const report = await this.reportRepository.findReportByPostAndUserId(data.postId, userId);
       if (data.postId === report?.postId && userId === report?.userId) {
         throw new BadRequestException('You have reported this post');
@@ -34,11 +31,7 @@ export class ReportService {
       if (!report) {
         throw new NotFoundException('Report not found');
       }
-      if (report.userId === userId) {
-        throw new BadRequestException('You cannot update your own report');
-      }
-
-      return await this.reportRepository.udateReportStatus(data);
+      return await this.reportRepository.updateReportStatus(data);
     } catch (error) {
       throw error;
     }
@@ -66,10 +59,6 @@ export class ReportService {
 
   async getReportById(reportId: string): Promise<Report | null> {
     return await this.reportRepository.findReportById(reportId);
-  }
-
-  async getAllReport(page: number, limit: number): Promise<Report[]> {
-    return await this.reportRepository.findAllReport(page, limit);
   }
 
   async getReportByUserId(userId: string, page: number, limit: number): Promise<Report[]> {

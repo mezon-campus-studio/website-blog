@@ -34,7 +34,7 @@ export class PrismaReportRepository implements IReportRepository {
     });
   }
 
-  async udateReportStatus(data: UpdateReportStatusDto): Promise<Report> {
+  async updateReportStatus(data: UpdateReportStatusDto): Promise<Report> {
     return await this.prisma.report.update({
       where: {
         id: data.reportId,
@@ -62,16 +62,6 @@ export class PrismaReportRepository implements IReportRepository {
         isActive: false,
         isDeleted: true,
         updatedBy: userId,
-      },
-    });
-  }
-
-  async findAllReport(page: number, limit: number): Promise<Report[]> {
-    return await this.prisma.report.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: {
-        createdAt: 'desc',
       },
     });
   }

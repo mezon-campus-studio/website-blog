@@ -9,7 +9,6 @@ import { validateDto } from '@/common/middleware/validate-dto.middleware';
 import { AttachTagsDto, CreatePostDto } from '@/modules/post/post.dto';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
 import { UpdatePostDto } from '@/modules/post/post.dto';
-import { authorize } from '@/common/middleware/authorize.middlerware';
 
 const postRouter = Router();
 const postRepository = new PrismaPostRepository(prisma);
@@ -60,7 +59,6 @@ postRouter.delete('/:postId', passportAuthenticateJwt, asyncHandler(postControll
 postRouter.patch(
   '/:postId/draft',
   passportAuthenticateJwt,
-
   asyncHandler(postController.saveDraft.bind(postController)),
 );
 
@@ -69,7 +67,6 @@ postRouter.patch('/:postId/publish', passportAuthenticateJwt, asyncHandler(postC
 postRouter.get(
   '/draft',
   passportAuthenticateJwt,
-
   asyncHandler(postController.getPostDraftByUserId.bind(postController)),
 );
 
@@ -83,7 +80,6 @@ postRouter.get('/hot', asyncHandler(postController.getHotsPost.bind(postControll
 postRouter.post(
   '/:postId/tags',
   passportAuthenticateJwt,
-  authorize('ADMIN', 'USER'),
   validateDto(AttachTagsDto),
   asyncHandler(postController.attachTagsToPost.bind(postController)),
 );
@@ -91,13 +87,11 @@ postRouter.post(
 postRouter.delete(
   '/:postId/tags/:tagId',
   passportAuthenticateJwt,
-  authorize('ADMIN', 'USER'),
   asyncHandler(postController.detachTagFromPost.bind(postController)),
 );
 
 postRouter.get(
   '/:postId/tags',
-  authorize('ADMIN', 'USER'),
   asyncHandler(postController.getTagsByPostId.bind(postController)),
 );
 

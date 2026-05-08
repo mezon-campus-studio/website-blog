@@ -8,7 +8,6 @@ import { AddUserDto, UpdateRoleDto } from '@/modules/admin/admin.dto';
 import { AdminService } from '@/modules/admin/admin.service';
 import { PrismaAdminRepository } from '@/modules/admin/prisma-admin.repository';
 import { Router } from 'express';
-import passport from 'passport';
 
 const adminRouter = Router();
 const adminnRepository = new PrismaAdminRepository(prisma);

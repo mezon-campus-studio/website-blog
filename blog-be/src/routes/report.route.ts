@@ -50,12 +50,6 @@ reportRouter.get(
 reportRouter.get('/myreport', asyncHandler(reportController.getMyreport.bind(reportController)));
 
 reportRouter.get(
-  '',
-  authorize('ADMIN'),
-  asyncHandler(reportController.getAllReport.bind(reportController)),
-);
-
-reportRouter.get(
   '/user/:userId',
   authorize('ADMIN'),
   validateDto(GetReportByUserDto, 'params'),
