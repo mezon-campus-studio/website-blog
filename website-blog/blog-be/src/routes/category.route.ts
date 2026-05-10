@@ -19,27 +19,27 @@ categoryRouter.use(passportAuthenticateJwt);
 
 categoryRouter.post(
   '',
-  authorize('ADMIN', 'USER'),
+  authorize('ADMIN'),
   validateDto(CreateCategoryDto),
   asyncHandler(categoryController.createCategory.bind(categoryController)),
 );
 
 categoryRouter.put(
   '/:category_id',
-  authorize('ADMIN', 'USER'),
+  authorize('ADMIN'),
   validateDto(UpdateCategoryDto),
   asyncHandler(categoryController.updateCategory.bind(categoryController)),
 );
 
 categoryRouter.delete(
   '/:category_id',
-  authorize('ADMIN', 'USER'),
+  authorize('ADMIN'),
   asyncHandler(categoryController.softDeleteCategory.bind(categoryController)),
 );
 
 categoryRouter.get(
   '/all',
-  authorize('ADMIN'),
+  authorize('ADMIN','USER'),
   asyncHandler(categoryController.getAllCategories.bind(categoryController)),
 );
 

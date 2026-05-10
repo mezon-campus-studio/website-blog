@@ -11,7 +11,7 @@ import { twMerge } from 'tailwind-merge';
 
 export default function ManagePostsPage() {
   const [filter, setFilter] = useState<'all' | 'draft' | 'published'>('all');
-  const { data: posts, isLoading } = useMyPosts(filter === 'all' ? undefined : filter);
+  const { data: allPosts, isLoading, error } = useMyPosts(); // Fetch all posts
   const { mutate: deletePost } = useDeletePost();
 
   const handleDelete = (id: string) => {
@@ -19,6 +19,16 @@ export default function ManagePostsPage() {
       deletePost(id);
     }
   };
+
+  if (error) {
+    console.error('[ManagePosts] Error fetching posts:', error);
+  }
+
+  const filteredPosts = allPosts?.filter(p => {
+    if (filter === 'draft') return p.isDraft;
+    if (filter === 'published') return !p.isDraft;
+    return true;
+  }) || [];
 
   return (
     <div className="container py-12 pb-24 space-y-10">
@@ -47,9 +57,9 @@ export default function ManagePostsPage() {
             </div>
             <CardContent className="p-4 flex flex-col gap-2">
               {[
-                { id: 'all', label: 'All Articles', count: posts?.length },
-                { id: 'published', label: 'Published', count: posts?.filter(p => !p.isDraft).length },
-                { id: 'draft', label: 'Drafts', count: posts?.filter(p => p.isDraft).length }
+                { id: 'all', label: 'All Articles', count: allPosts?.length },
+                { id: 'published', label: 'Published', count: allPosts?.filter(p => !p.isDraft).length },
+                { id: 'draft', label: 'Drafts', count: allPosts?.filter(p => p.isDraft).length }
               ].map((item) => (
                 <button
                   key={item.id}
@@ -101,9 +111,9 @@ export default function ManagePostsPage() {
                 <div key={i} className="h-48 rounded-2xl bg-card-bg/20 animate-pulse border border-card-border" />
               ))}
             </div>
-          ) : posts && posts.length > 0 ? (
+          ) : filteredPosts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">
-              {posts.map((post) => (
+              {filteredPosts.map((post) => (
                 <PostManagementCard 
                   key={post.id} 
                   post={post} 

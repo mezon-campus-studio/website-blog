@@ -4,6 +4,8 @@ import "./globals.css";
 
 
 import { QueryProvider, AuthProvider } from "@/providers";
+import { Toaster } from "sonner";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -41,6 +43,8 @@ export default function RootLayout({
         <AuthProvider>
           <QueryProvider>
             <main className="w-full">{children}</main>
+            <Toaster richColors position="bottom-right" />
+
           </QueryProvider>
         </AuthProvider>
       </body>

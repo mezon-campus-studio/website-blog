@@ -1,40 +1,35 @@
+import { useQuery } from '@tanstack/react-query';
+import apiClient from '@/lib/api-client';
+
 export interface Category {
   id: string;
   name: string;
+  slug: string;
   description?: string;
 }
 
 export interface Tag {
   id: string;
   name: string;
+  slug: string;
 }
 
-export const MOCK_CATEGORIES: Category[] = [
-  { id: '1', name: 'Technology', description: 'Latest in tech' },
-  { id: '2', name: 'Lifestyle', description: 'Daily life and more' },
-  { id: '3', name: 'Design', description: 'Art and aesthetics' },
-  { id: '4', name: 'Productivity', description: 'Work smarter' },
-];
-
-export const MOCK_TAGS: Tag[] = [
-  { id: '1', name: 'Next.js' },
-  { id: '2', name: 'React' },
-  { id: '3', name: 'Tailwind' },
-  { id: '4', name: 'AI' },
-  { id: '5', name: 'Frontend' },
-  { id: '6', name: 'Backend' },
-];
-
 export const useCategories = () => {
-  return {
-    data: MOCK_CATEGORIES,
-    isLoading: false,
-  };
+  return useQuery<Category[], Error>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ data: Category[] }>('/category/all');
+      return data.data || [];
+    },
+  });
 };
 
 export const useTags = () => {
-  return {
-    data: MOCK_TAGS,
-    isLoading: false,
-  };
+  return useQuery<Tag[], Error>({
+    queryKey: ['tags'],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ data: Tag[] }>('/tag/all');
+      return data.data || [];
+    },
+  });
 };

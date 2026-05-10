@@ -31,6 +31,10 @@ export function useUpdatePost(id: string) {
 
   return useMutation<void, Error, FormData>({
     mutationFn: async (formData) => {
+      // Backend UpdatePostDto does NOT allow isDraft or tagIds
+      formData.delete('isDraft');
+      formData.delete('tagIds');
+      
       await apiClient.put(`/post/${id}`, formData);
     },
     onSuccess: () => {
@@ -40,13 +44,30 @@ export function useUpdatePost(id: string) {
   });
 }
 
-export function usePostBySlug(slug: string) {
-  return useQuery<Post, Error>({
-    queryKey: ['posts', 'slug', slug],
-    queryFn: async () => {
-      const { data } = await apiClient.get<{ data: Post }>(`/post/slug/${slug}`);
-      return data.data;
+export function usePublishPost() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
+      await apiClient.patch(`/post/${id}/publish`);
     },
-    enabled: !!slug,
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts', id] });
+    },
+  });
+}
+
+export function useSaveDraft() {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, Error, string>({
+    mutationFn: async (id) => {
+      await apiClient.patch(`/post/${id}/draft`);
+    },
+    onSuccess: (_, id) => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      queryClient.invalidateQueries({ queryKey: ['posts', id] });
+    },
   });
 }

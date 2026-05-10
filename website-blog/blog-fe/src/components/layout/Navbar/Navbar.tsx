@@ -8,6 +8,8 @@ import { useDarkMode } from "@/hooks/useDarkMode";
 import { useAuth, useLogout } from "@/features/auth/hooks";
 import { LogOut, User as UserIcon, LayoutDashboard } from "lucide-react";
 import RoleGate from "@/components/auth/RoleGate";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
+
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useDarkMode();
@@ -79,6 +81,9 @@ export const Navbar = () => {
           >
             {theme === "light" ? "🌙" : "☀️"}
           </button>
+          
+          {user && <NotificationBell />}
+
 
           {user ? (
             <div className="flex items-center gap-4">

@@ -31,7 +31,8 @@ export const PostForm: React.FC<PostFormProps> = ({ initialData, onSubmit, isLoa
   const [tags, setTags] = useState<string[]>(initialData?.tags || []);
   const [tagInput, setTagInput] = useState('');
 
-  const { data: categories } = useCategories();
+  const { data: categories, isLoading: isCategoriesLoading } = useCategories();
+  const { data: allTags, isLoading: isTagsLoading } = useTags();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +79,13 @@ export const PostForm: React.FC<PostFormProps> = ({ initialData, onSubmit, isLoa
     formData.append('content', content);
     formData.append('categoryId', categoryId);
     formData.append('isDraft', status === 'draft' ? 'true' : 'false');
-    formData.append('tags', JSON.stringify(tags));
+    // Map tag names to IDs for the backend
+    const selectedTagIds = tags.map(tagName => {
+      const foundTag = allTags?.find(t => t.name === tagName);
+      return foundTag?.id;
+    }).filter(id => !!id);
+
+    formData.append('tagIds', JSON.stringify(selectedTagIds));
     if (thumbnail) {
       formData.append('thumbnail', thumbnail);
     }
@@ -215,21 +222,29 @@ export const PostForm: React.FC<PostFormProps> = ({ initialData, onSubmit, isLoa
                   Category
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {(categories || []).map((cat: any) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setCategoryId(cat.id)}
-                      className={twMerge(
-                        "p-3 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all",
-                        categoryId === cat.id 
-                          ? "bg-primary/10 border-primary text-primary" 
-                          : "bg-card-bg/50 border-card-border text-muted-foreground hover:border-primary/50"
-                      )}
-                    >
-                      {cat.name}
-                    </button>
-                  ))}
+                  {isCategoriesLoading ? (
+                    <div className="col-span-2 py-4 flex justify-center">
+                      <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  ) : (categories || []).length > 0 ? (
+                    (categories || []).map((cat: any) => (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => setCategoryId(cat.id)}
+                        className={twMerge(
+                          "p-3 rounded-xl border text-[10px] font-bold uppercase tracking-wider transition-all",
+                          categoryId === cat.id 
+                            ? "bg-primary/10 border-primary text-primary" 
+                            : "bg-card-bg/50 border-card-border text-muted-foreground hover:border-primary/50"
+                        )}
+                      >
+                        {cat.name}
+                      </button>
+                    ))
+                  ) : (
+                    <p className="col-span-2 text-[10px] text-muted-foreground text-center py-2 italic">No categories found</p>
+                  )}
                 </div>
               </div>
 
@@ -238,30 +253,55 @@ export const PostForm: React.FC<PostFormProps> = ({ initialData, onSubmit, isLoa
                   <TagIcon size={14} />
                   Tags
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <span 
-                      key={tag} 
-                      className="px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[9px] font-bold uppercase flex items-center gap-1 group"
-                    >
-                      {tag}
-                      <button 
-                        type="button" 
-                        onClick={() => removeTag(tag)}
-                        className="hover:text-destructive transition-colors"
+                <div className="space-y-3">
+                  <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => (
+                      <span 
+                        key={tag} 
+                        className="px-2 py-1 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[9px] font-bold uppercase flex items-center gap-1 group"
                       >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                  <input
-                    type="text"
-                    placeholder="Add tag and press Enter..."
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleAddTag}
-                    className="flex-grow bg-card-bg/50 border border-card-border rounded-lg px-3 py-1 text-[10px] outline-none focus:border-primary/50 transition-colors"
-                  />
+                        {tag}
+                        <button 
+                          type="button" 
+                          onClick={() => removeTag(tag)}
+                          className="hover:text-destructive transition-colors"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      placeholder="Add tag..."
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={handleAddTag}
+                      className="flex-grow bg-card-bg/50 border border-card-border rounded-lg px-3 py-1 text-[10px] outline-none focus:border-primary/50 transition-colors min-w-[120px]"
+                    />
+                  </div>
+
+                  {/* Suggested Tags from BE */}
+                  {!isTagsLoading && allTags && allTags.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/50">Suggestions</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {allTags
+                          .filter(t => !tags.includes(t.name))
+                          .slice(0, 10)
+                          .map(tag => (
+                            <button
+                              key={tag.id}
+                              type="button"
+                              onClick={() => setTags([...tags, tag.name])}
+                              className="px-2 py-0.5 bg-card-bg/30 hover:bg-primary/10 border border-card-border hover:border-primary/30 rounded-md text-[9px] text-muted-foreground hover:text-primary transition-all"
+                            >
+                              + {tag.name}
+                            </button>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

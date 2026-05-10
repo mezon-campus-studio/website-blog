@@ -16,7 +16,6 @@ const postRepository = new PrismaPostRepository(prisma);
 const postService = new PostService(postRepository);
 const postController = new PostController(postService);
 
-postRouter.use(passportAuthenticateJwt);
 
 postRouter.post(
   '',
@@ -44,6 +43,10 @@ postRouter.get(
   '/reader/category/:slug',
   asyncHandler(postController.getReaderPostsByCategorySlug.bind(postController)),
 );
+
+postRouter.get('/:postId', asyncHandler(postController.getPostById.bind(postController)));
+
+postRouter.use(passportAuthenticateJwt);
 
 postRouter.put(
   '/:postId',
@@ -73,12 +76,12 @@ postRouter.get(
 
 postRouter.get(
   '/published',
+  passportAuthenticateJwt,
   asyncHandler(postController.getPostPublishedByUserId.bind(postController)),
 );
 
 postRouter.get('/hot', asyncHandler(postController.getHotsPost.bind(postController)));
 
-postRouter.get('/:post_id', asyncHandler(postController.getPostById.bind(postController)));
 postRouter.post(
   '/:postId/tags',
   authorize('ADMIN', 'USER'),
@@ -97,7 +100,5 @@ postRouter.get(
   authorize('ADMIN', 'USER'),
   asyncHandler(postController.getTagsByPostId.bind(postController)),
 );
-
-postRouter.get('/:postId', asyncHandler(postController.getPostById.bind(postController)));
 
 export default postRouter;

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { Post } from '../types';
+import { useAuthStore } from '@/features/auth/store/authStore';
 
 export function useCreatePost() {
   const queryClient = useQueryClient();
@@ -8,34 +9,35 @@ export function useCreatePost() {
   return useMutation<Post, Error, any>({
     mutationFn: async (inputData) => {
       let finalData: any;
+      let shouldPublish = false;
 
       if (inputData instanceof FormData) {
+        shouldPublish = inputData.get('isDraft') === 'false';
         inputData.delete('isDraft');
-        inputData.delete('tags');
-
-        // Ensure categoryId is a string and not empty
-        if (!inputData.get('categoryId')) {
-          console.warn('[PostForm] Missing categoryId, ensure you select one in the form');
-        }
-
+        
         if (!inputData.get('thumbnail')) {
-          // Send an empty Blob to prevent backend from crashing with "undefined" req.files
-          // This satisfies the backend's "files.thumbnail" access without uploading a real image
           const emptyBlob = new Blob([''], { type: 'image/png' });
           inputData.set('thumbnail', emptyBlob, 'empty.png');
         }
         finalData = inputData;
       } else {
+        shouldPublish = inputData.isDraft === false;
         finalData = { ...inputData };
         delete finalData.isDraft;
-        delete finalData.tags;
       }
 
       try {
         const { data } = await apiClient.post<{ message: string; data: Post }>('/post', finalData);
-        return data.data;
+        const createdPost = data.data;
+
+        // If user wanted to publish, call the publish endpoint after creation
+        if (shouldPublish && createdPost.id) {
+          console.log(`[useCreatePost] Publishing post ${createdPost.id}...`);
+          await apiClient.patch(`/post/${createdPost.id}/publish`);
+        }
+
+        return createdPost;
       } catch (error: any) {
-        // Log detailed validation errors from backend
         if (error.response?.data) {
           console.error('❌ BACKEND VALIDATION ERROR:', JSON.stringify(error.response.data, null, 2));
         }
@@ -49,14 +51,28 @@ export function useCreatePost() {
 }
 
 export function useMyPosts(status?: 'draft' | 'published') {
+  const user = useAuthStore((state) => state.user);
+  
   return useQuery<Post[], Error>({
-    queryKey: ['posts', 'my', status],
+    queryKey: ['posts', 'my', user?.id, status],
     queryFn: async () => {
-      // Mapping internal status to backend endpoints
-      const endpoint = status === 'draft' ? '/post/draft' : status === 'published' ? '/post/published' : '/post/user/me';
-      const { data } = await apiClient.get<{ data: Post[] }>(endpoint);
-      return data.data || [];
+      if (!user?.id) return [];
+      
+      // Using the generic user posts endpoint which is stable in the backend
+      const { data } = await apiClient.get<{ data: Post[] }>(`/post/user/${user.id}`);
+      const posts = data.data || [];
+      
+      // Filter locally based on status as the backend endpoint doesn't support it
+      if (status === 'draft') {
+        return posts.filter(p => p.isDraft);
+      }
+      if (status === 'published') {
+        return posts.filter(p => !p.isDraft);
+      }
+      
+      return posts;
     },
+    enabled: !!user?.id,
   });
 }
 

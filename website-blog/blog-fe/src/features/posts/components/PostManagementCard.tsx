@@ -3,10 +3,11 @@
 import React from 'react';
 import { Post } from '../types';
 import { Card, CardContent } from '@/components/ui';
-import { Edit, Trash2, Eye, Calendar, Clock, FileText } from 'lucide-react';
+import { Edit, Trash2, Eye, Calendar, Clock, FileText, Send, Undo2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { twMerge } from 'tailwind-merge';
+import { usePublishPost, useSaveDraft } from '../hooks/usePostActions';
 
 interface PostManagementCardProps {
   post: Post;
@@ -14,6 +15,21 @@ interface PostManagementCardProps {
 }
 
 export const PostManagementCard: React.FC<PostManagementCardProps> = ({ post, onDelete }) => {
+  const { mutate: publishPost, isPending: isPublishing } = usePublishPost();
+  const { mutate: saveDraft, isPending: isSavingDraft } = useSaveDraft();
+
+  const handleToggleStatus = () => {
+    if (post.isDraft) {
+      if (confirm('Are you sure you want to publish this story? It will be visible to everyone.')) {
+        publishPost(post.id);
+      }
+    } else {
+      if (confirm('Move this story back to drafts? It will be hidden from the public feed.')) {
+        saveDraft(post.id);
+      }
+    }
+  };
+
   const formattedDate = new Date(post.createdAt).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -78,6 +94,19 @@ export const PostManagementCard: React.FC<PostManagementCardProps> = ({ post, on
                 <Edit size={16} />
               </Link>
               <button 
+                onClick={handleToggleStatus}
+                disabled={isPublishing || isSavingDraft}
+                className={twMerge(
+                  "p-2 rounded-lg transition-all shadow-sm",
+                  post.isDraft 
+                    ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white" 
+                    : "bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white"
+                )}
+                title={post.isDraft ? "Publish" : "Move to Draft"}
+              >
+                {post.isDraft ? <Send size={16} /> : <Undo2 size={16} />}
+              </button>
+              <button 
                 onClick={() => onDelete?.(post.id)}
                 className="p-2 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive hover:text-white transition-all shadow-sm"
                 title="Delete"
@@ -86,7 +115,7 @@ export const PostManagementCard: React.FC<PostManagementCardProps> = ({ post, on
               </button>
             </div>
             <Link 
-              href={`/posts/${post.slug}`} // View on public site
+              href={`/posts/${post.id}`} // View on public site
               className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
             >
               <Eye size={14} />

@@ -11,7 +11,10 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       try {
-        await apiClient.post('/auth/logout');
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        if (token) {
+          await apiClient.post('/auth/logout');
+        }
       } catch (error) {
         console.error('Logout API error:', error);
       } finally {

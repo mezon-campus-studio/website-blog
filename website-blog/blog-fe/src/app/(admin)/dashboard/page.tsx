@@ -37,8 +37,7 @@ export default function AdminDashboard() {
 
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
-    const { role, ...creationData } = newData;
-    createUser(creationData, {
+    createUser(newData, {
       onSuccess: () => {
         setIsAddModalOpen(false);
         setNewData({ name: '', email: '', password: '', role: 'USER' });

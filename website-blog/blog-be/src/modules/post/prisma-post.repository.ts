@@ -208,10 +208,12 @@ export class PrismaPostRepository implements IPostRepository {
     return posts;
   }
 
-  async findCategoryById(categoryId: string): Promise<Category> {
-    return await this.prisma.post.findMany({
+  async findCategoryById(categoryId: string): Promise<Category | null> {
+    return await this.prisma.category.findUnique({
       where: {
-        categoryId,
+        id: categoryId,
+        isDeleted: false,
+        isActive: true,
       },
     });
   }
@@ -263,19 +265,29 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
 
-  async findTagsByPostId(postId: string): Promise<string[]> {
-    return await this.prisma.post.findUnique({
+  async findTagsByPostId(postId: string): Promise<Tag[]> {
+    const postWithTags = await this.prisma.post.findUnique({
       where: {
         id: postId,
       },
-      include: {
+      select: {
         tags: {
-          include: {
+          where: {
+            isDeleted: false,
+            isActive: true,
+            tag: {
+              isDeleted: false,
+              isActive: true,
+            },
+          },
+          select: {
             tag: true,
           },
         },
       },
     });
+
+    return postWithTags?.tags.map((t) => t.tag) || [];
   }
 
   async findPostByLikeCount(page: number, limit: number): Promise<Post[]> {

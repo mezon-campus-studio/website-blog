@@ -7,6 +7,7 @@ interface CreateUserDto {
   name: string;
   email: string;
   password: string;
+  role?: string;
 }
 
 export function useCreateUser() {
@@ -14,32 +15,8 @@ export function useCreateUser() {
 
   return useMutation({
     mutationFn: async (dto: CreateUserDto) => {
-      // CAPTURE current admin session BEFORE it gets overwritten or cleared
-      const adminUser = useAuthStore.getState().user;
-      const adminToken = useAuthStore.getState().token;
-
-      console.log('🛠 [useCreateUser] Attempting to create user while preserving Admin:', adminUser?.name);
-      
-      const signUpData = {
-        ...dto,
-        confirmPassword: dto.password,
-      };
-
-      try {
-        const { data } = await apiClient.post<{ user: User }>('/auth/register', signUpData);
-        return data;
-      } finally {
-        // ALWAYS RESTORE Admin Session regardless of success/failure
-        // This prevents the admin from being logged out by the backend's Set-Cookie header
-        if (adminUser && adminToken) {
-          console.log('✅ [useCreateUser] Force-restoring Admin session for:', adminUser.name);
-          useAuthStore.getState().setAuth(adminUser, adminToken);
-          
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('token', adminToken);
-          }
-        }
-      }
+      const { data } = await apiClient.post<{ data: User }>('/admin/add-user', dto);
+      return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
