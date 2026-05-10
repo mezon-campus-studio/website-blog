@@ -87,7 +87,7 @@ export class PostController {
 
   async saveDraft(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
-    const postId = req.params.post_id as string;
+    const postId = req.params.postId as string;
     await this.postService.updateDraftStatus(userId, postId, true);
     res.status(200).json({
       message: 'Post saved as draft successfully',
@@ -96,7 +96,7 @@ export class PostController {
 
   async publishPost(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
-    const postId = req.params.post_id as string;
+    const postId = req.params.postId as string;
     await this.postService.updateDraftStatus(userId, postId, false);
     res.status(200).json({
       message: 'Post published successfully',
