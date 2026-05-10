@@ -65,8 +65,6 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.findUnique({
       where: {
         id: postId,
-        isDeleted: false,
-        isActive: true,
       },
     });
   }
