@@ -9,14 +9,12 @@ import { validateDto } from '@/common/middleware/validate-dto.middleware';
 import { AttachTagsDto, CreatePostDto } from '@/modules/post/post.dto';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
 import { UpdatePostDto } from '@/modules/post/post.dto';
-import { authorize } from '@/common/middleware/authorize.middlerware';
 
 const postRouter = Router();
 const postRepository = new PrismaPostRepository(prisma);
 const postService = new PostService(postRepository);
 const postController = new PostController(postService);
 
-postRouter.use(passportAuthenticateJwt);
 
 postRouter.post(
   '',
@@ -47,6 +45,7 @@ postRouter.get(
 
 postRouter.put(
   '/:postId',
+  passportAuthenticateJwt,
   uploadImage.fields([
     { name: 'thumbnail', maxCount: 1 },
     { name: 'images', maxCount: 10 },
@@ -55,19 +54,19 @@ postRouter.put(
   asyncHandler(postController.updatePost.bind(postController)),
 );
 
-postRouter.delete('/:postId', asyncHandler(postController.deletePost.bind(postController)));
+postRouter.delete('/:postId', passportAuthenticateJwt, asyncHandler(postController.deletePost.bind(postController)));
 
 postRouter.patch(
   '/:postId/draft',
-
+  passportAuthenticateJwt,
   asyncHandler(postController.saveDraft.bind(postController)),
 );
 
-postRouter.patch('/:postId/publish', asyncHandler(postController.publishPost.bind(postController)));
+postRouter.patch('/:postId/publish', passportAuthenticateJwt, asyncHandler(postController.publishPost.bind(postController)));
 
 postRouter.get(
   '/draft',
-
+  passportAuthenticateJwt,
   asyncHandler(postController.getPostDraftByUserId.bind(postController)),
 );
 
@@ -78,23 +77,21 @@ postRouter.get(
 
 postRouter.get('/hot', asyncHandler(postController.getHotsPost.bind(postController)));
 
-postRouter.get('/:post_id', asyncHandler(postController.getPostById.bind(postController)));
 postRouter.post(
   '/:postId/tags',
-  authorize('ADMIN', 'USER'),
+  passportAuthenticateJwt,
   validateDto(AttachTagsDto),
   asyncHandler(postController.attachTagsToPost.bind(postController)),
 );
 
 postRouter.delete(
   '/:postId/tags/:tagId',
-  authorize('ADMIN', 'USER'),
+  passportAuthenticateJwt,
   asyncHandler(postController.detachTagFromPost.bind(postController)),
 );
 
 postRouter.get(
   '/:postId/tags',
-  authorize('ADMIN', 'USER'),
   asyncHandler(postController.getTagsByPostId.bind(postController)),
 );
 

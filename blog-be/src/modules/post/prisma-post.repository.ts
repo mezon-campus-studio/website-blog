@@ -65,8 +65,6 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.findUnique({
       where: {
         id: postId,
-        isDeleted: false,
-        isActive: true,
       },
     });
   }
@@ -280,20 +278,20 @@ export class PrismaPostRepository implements IPostRepository {
 
   async findPostByLikeCount(page: number, limit: number): Promise<Post[]> {
     const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate()-30);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     return await this.prisma.post.findMany({
       where: {
         isDraft: false,
         isDeleted: false,
         isActive: true,
-        createdAt:{
+        createdAt: {
           gte: thirtyDaysAgo,
-        }
+        },
       },
       orderBy: {
-        likeCount: 'desc'
+        likeCount: 'desc',
       },
-      skip :(page-1) * limit,
+      skip: (page - 1) * limit,
       take: limit,
     });
   }
