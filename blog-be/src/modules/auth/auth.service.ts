@@ -1,27 +1,22 @@
 import bcrypt from 'bcrypt';
 import { InternalServerException, UnauthorizedException } from '@/common/utils/app-error';
 import { IAuthRepository } from './auth.repository';
-import { SignUpDto } from './dto/signup.dto';
-import { SignInDto } from './dto/signin.dto';
-import { Logger } from 'winston';
+import { SignInDto, SignUpDto } from './auth.dto';
+
 export class AuthService {
-  constructor(
-    private readonly authRepository: IAuthRepository,
-    private readonly logger: Logger,
-  ) {}
+  constructor(private readonly authRepository: IAuthRepository) {}
 
   async register(body: SignUpDto) {
     try {
       const { name, email, password, confirmPassword } = body;
-
-      if (password !== confirmPassword) {
-        throw new UnauthorizedException('Passwords do not match');
-      }
-
       const existingUser = await this.authRepository.findUserByEmail(email);
 
       if (existingUser) {
         throw new UnauthorizedException('User with this email already exists');
+      }
+
+      if (password !== confirmPassword) {
+        throw new UnauthorizedException('Passwords do not match');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -42,7 +37,6 @@ export class AuthService {
   async login(body: SignInDto) {
     try {
       const { email, password } = body;
-
       const user = await this.authRepository.findUserByEmail(email);
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -53,16 +47,12 @@ export class AuthService {
     } catch (error) {
 <<<<<<< HEAD:blog-be/src/modules/auth/auth.service.ts
       if (error instanceof UnauthorizedException) {
-<<<<<<< HEAD
         
 =======
       console.error('🔥 LOGIN CRASH ERROR:', error);
       if (error instanceof UnauthorizedException) {
         throw error;
 >>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/auth/auth.service.ts
-=======
-        throw error;
->>>>>>> parent of 4c4042a (merge dev)
       }
 
       throw new InternalServerException('Failed to login');

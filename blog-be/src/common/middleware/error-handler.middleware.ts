@@ -3,8 +3,6 @@ import { AppError, ErrorCodes } from '@/common/utils/app-error';
 import { ErrorRequestHandler } from 'express';
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, next): any => {
-  console.error(`Error: ${req.path}`, error);
-
   if (error instanceof AppError) {
     return res.status(error.statusCode).json({
       message: error.message,

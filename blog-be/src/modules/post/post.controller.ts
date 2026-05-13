@@ -1,7 +1,8 @@
 import { PostService } from './post.service';
-import { CreatePostDto } from './dto/create-post.dto';
+import { AttachTagsDto, CreatePostDto } from './post.dto';
 import { NextFunction, Request, Response } from 'express';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { UpdatePostDto } from './post.dto';
+import { HTTPSTATUS } from '@/config/http.config';
 
 export class PostController {
 <<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
@@ -10,7 +11,7 @@ export class PostController {
   constructor(private readonly postService: PostService) { }
 >>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.controller.ts
 
-  async createPost(req: Request, res: Response, next: NextFunction) {
+  async createPost(req: Request, res: Response, _next: NextFunction) {
     const userId = (req as any).user.id;
     const files = req.files as {
       thumbnail?: Express.Multer.File[];
@@ -29,7 +30,7 @@ export class PostController {
     });
   }
 
-  async updatePost(req: Request, res: Response, next: NextFunction) {
+  async updatePost(req: Request, res: Response, _next: NextFunction) {
     const userId = (req as any).user.id;
     const files = req.files as {
       thumbnail?: Express.Multer.File[];
@@ -59,7 +60,7 @@ export class PostController {
   }
 
   async getPostById(req: Request, res: Response, next: NextFunction) {
-    const post = await this.postService.getPostById(req.params.post_id as string);
+    const post = await this.postService.getPostById(req.params.postId as string);
     res.status(200).json({
       message: 'Post fetched successfully',
       data: post,
@@ -87,17 +88,6 @@ export class PostController {
     });
   }
 
-  async getPostByCategoryId(req: Request, res: Response, next: NextFunction) {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-    const categoryId = req.params.category_id as string;
-    const posts = await this.postService.getPostByCategoryId(page, limit, categoryId);
-    res.status(200).json({
-      message: 'Posts fetched successfully',
-      data: posts,
-    });
-  }
-
   async deletePost(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
 <<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
@@ -113,7 +103,7 @@ export class PostController {
 
   async saveDraft(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
-    const postId = req.params.post_id as string;
+    const postId = req.params.postId as string;
     await this.postService.updateDraftStatus(userId, postId, true);
     res.status(200).json({
       message: 'Post saved as draft successfully',
@@ -122,7 +112,7 @@ export class PostController {
 
   async publishPost(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
-    const postId = req.params.post_id as string;
+    const postId = req.params.postId as string;
     await this.postService.updateDraftStatus(userId, postId, false);
     res.status(200).json({
       message: 'Post published successfully',
@@ -150,7 +140,6 @@ export class PostController {
       data: posts,
     });
   }
-<<<<<<< HEAD
 
 <<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
   async getHotsPost(req: Request, res: Response, _next: NextFunction){
@@ -269,6 +258,4 @@ export class PostController {
     });
   }
 >>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.controller.ts
-=======
->>>>>>> parent of 4c4042a (merge dev)
 }
