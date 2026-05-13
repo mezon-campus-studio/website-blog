@@ -15,16 +15,6 @@ export const readerPostArgs = Prisma.validator<Prisma.PostDefaultArgs>()({
         slug: true,
       },
     },
-<<<<<<< HEAD:blog-be/src/types/post-reader.type.ts
-=======
-    user: {
-      select: {
-        id: true,
-        name: true,
-        avatar_url: true,
-      },
-    },
->>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/types/post-reader.type.ts
     tags: {
       where: {
         isDeleted: false,
