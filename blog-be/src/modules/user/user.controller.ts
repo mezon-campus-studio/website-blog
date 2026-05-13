@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { HTTPSTATUS } from '@/config/http.config';
 import { UserService } from './user.service';
-import { ChangePasswordDto, UpdateProfileDto } from './user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 export class UserController {
   constructor(private readonly userService: UserService) {}

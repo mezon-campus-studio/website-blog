@@ -1,20 +1,22 @@
 import { PrismaClient } from '@prisma/client';
-import { IUserRepository } from './user.repository';
-import { UpdateProfileDto } from './user.dto';
-import { PublicUser, publicUserArgs } from '@/types/user.type';
+import { IUserRepository, PublicUser, publicUserArgs, UpdateProfileData } from './user.repository';
+import { Logger } from 'winston';
 
 export class PrismaUserRepository implements IUserRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly logger: Logger,
+  ) {}
 
-  async findUserActiveById(userId: string): Promise<PublicUser | null> {
-    return await this.prisma.user.findUnique({
+  findUserById(userId: string): Promise<PublicUser | null> {
+    return this.prisma.user.findUnique({
       where: { id: userId, isActive: true },
       ...publicUserArgs,
     });
   }
 
-  async findUserByAdmin(userId: string): Promise<PublicUser | null> {
-    return await this.prisma.user.findUnique({
+  findUserByIdForAdmin(userId: string): Promise<PublicUser | null> {
+    return this.prisma.user.findUnique({
       where: { id: userId, isDeleted: false },
       ...publicUserArgs,
     });
@@ -29,15 +31,15 @@ export class PrismaUserRepository implements IUserRepository {
     return user?.password ?? null;
   }
 
-  async getAllUsers(): Promise<PublicUser[]> {
-    return await this.prisma.user.findMany({
+  getAllUsers(): Promise<PublicUser[]> {
+    return this.prisma.user.findMany({
       where: { isDeleted: false },
       ...publicUserArgs,
     });
   }
 
-  async updateProfile(userId: string, data: UpdateProfileDto): Promise<PublicUser> {
-    return await this.prisma.user.update({
+  updateProfile(userId: string, data: UpdateProfileData): Promise<PublicUser> {
+    return this.prisma.user.update({
       where: { id: userId },
       data: {
         ...(data.name !== undefined ? { name: data.name } : {}),
@@ -49,8 +51,8 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async updateAvatar(userId: string, avatarUrl: string): Promise<PublicUser> {
-    return await this.prisma.user.update({
+  updateAvatar(userId: string, avatarUrl: string): Promise<PublicUser> {
+    return this.prisma.user.update({
       where: { id: userId },
       data: {
         avatar_url: avatarUrl,

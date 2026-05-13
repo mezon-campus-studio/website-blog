@@ -5,9 +5,15 @@ import { Env } from './env.config';
 import prisma from '@/lib/prisma';
 import { UserService } from '@/modules/user/user.service';
 import { PrismaUserRepository } from '@/modules/user/prisma-user.repository';
+import { createLogger, format, transports } from 'winston';
 
-const userRepository = new PrismaUserRepository(prisma);
-const userService = new UserService(userRepository);
+const logger = createLogger({
+  format: format.combine(format.timestamp(), format.json()),
+  transports: [new transports.Console()],
+});
+
+const userRepository = new PrismaUserRepository(prisma, logger);
+const userService = new UserService(userRepository, logger);
 
 passport.use(
   new JwtStrategy(
@@ -25,7 +31,7 @@ passport.use(
     },
     async ({ userId }, done) => {
       try {
-        const user = userId && (await userService.findUserActiveById(userId));
+        const user = userId && (await userService.findUserById(userId));
 
         if (!user) {
           throw new UnauthorizedException('Unauthorized: User not found');

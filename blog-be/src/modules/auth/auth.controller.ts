@@ -2,10 +2,15 @@ import { HTTPSTATUS } from '@/config/http.config';
 import { clearJwtAuthCookie, setJwtAuthCookie } from '@/common/utils/cookie';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { SignInDto, SignUpDto } from './auth.dto';
+import { SignUpDto } from './dto/signup.dto';
+import { SignInDto } from './dto/signin.dto';
+import { Logger } from 'winston';
 
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly logger: Logger,
+  ) {}
 
   async register(req: Request, res: Response) {
     const dto = req.body as SignUpDto;

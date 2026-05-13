@@ -1,9 +1,8 @@
 import { PrismaClient } from '@prisma/client/extension';
-import { CreatePostDto } from './post.dto';
-import { Category, Post } from '@prisma/client';
+import { CreatePostDto } from './dto/create-post.dto';
+import { Post } from '@prisma/client';
 import { IPostRepository } from './post.repository';
-import { UpdatePostDto } from './post.dto';
-import { readerPostArgs, ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 export class PrismaPostRepository implements IPostRepository {
 <<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
@@ -67,9 +66,11 @@ export class PrismaPostRepository implements IPostRepository {
 
 <<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
   async findPostById(postId: string): Promise<Post | null> {
-    return await this.prisma.post.findUnique({
+    return await this.prisma.post.findFirst({
       where: {
         id: postId,
+        isDeleted: false,
+        isActive: true,
       },
     });
   }
@@ -128,6 +129,21 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
 
+  async findPostByCategoryId(page: number, limit: number, categoryId: string): Promise<Post[]> {
+    return await this.prisma.post.findMany({
+      where: {
+        categoryId: categoryId,
+        isDeleted: false,
+        isActive: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  }
+
   async updatePost(
     data: Omit<UpdatePostDto, 'images'> & {
       slug: string;
@@ -141,6 +157,9 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.update({
       where: {
         id: postId,
+        userId: userId,
+        isDeleted: false,
+        isActive: true,
       },
       data: {
         title: data.title,
@@ -159,6 +178,9 @@ export class PrismaPostRepository implements IPostRepository {
     return await this.prisma.post.update({
       where: {
         id: post_id,
+        userId: user_id,
+        isDeleted: false,
+        isActive: true,
       },
       data: {
         isDeleted: true,
@@ -169,9 +191,11 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async updateDraftStatus(userId: string, postId: string, isDraft: boolean): Promise<Post> {
-    const result = await this.prisma.post.update({
+    const result = await this.prisma.post.updateMany({
       where: {
         id: postId,
+        userId,
+        isDraft: !isDraft,
       },
       data: {
         isDraft,
@@ -179,7 +203,9 @@ export class PrismaPostRepository implements IPostRepository {
       },
     });
 
-    return result;
+    return await this.prisma.post.findUniqueOrThrow({
+      where: { id: postId },
+    });
   }
 
   async findPostByUserIdAndDraftStatus(
@@ -192,12 +218,15 @@ export class PrismaPostRepository implements IPostRepository {
       where: {
         userId,
         isDraft,
+        isDeleted: false,
+        isActive: true,
       },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * limit,
       take: limit,
     });
   }
+<<<<<<< HEAD
 
   async findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]> {
     const where: any = {};
@@ -365,4 +394,6 @@ export class PrismaPostRepository implements IPostRepository {
       take: limit,
     });
   }
+=======
+>>>>>>> parent of 4c4042a (merge dev)
 }

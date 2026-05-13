@@ -1,9 +1,17 @@
 import { IsOptional, IsString } from 'class-validator';
 
-export class SearchDto {
+export class UpdatePostDto {
   @IsOptional()
   @IsString()
-  keyword?: string;
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  content?: string;
+
+  @IsOptional()
+  @IsString()
+  thumbnail?: string;
 
   @IsOptional()
   @IsString()
@@ -11,5 +19,5 @@ export class SearchDto {
 
   @IsOptional()
   @IsString()
-  tagId?: string;
+  images?: string[];
 }
