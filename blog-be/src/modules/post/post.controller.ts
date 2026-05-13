@@ -32,7 +32,7 @@ export class PostController {
       thumbnail?: Express.Multer.File[];
       images?: Express.Multer.File[];
     };
-    const postid = req.params.post_id as string;
+    const postid = req.params.postId as string;
     const post = await this.postService.updatePost(
       req.body as UpdatePostDto,
       userId,
@@ -78,7 +78,7 @@ export class PostController {
 
   async deletePost(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
-    const postId = req.params.post_id as string;
+    const postId = req.params.postId as string;
     await this.postService.deletePost(userId, postId);
     res.status(200).json({
       message: 'Post deleted successfully',
