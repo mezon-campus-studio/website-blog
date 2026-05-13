@@ -208,11 +208,10 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async findCategoryById(categoryId: string): Promise<Category | null> {
-    return await this.prisma.category.findFirst({
+    return await this.prisma.category.findUnique({
       where: {
         id: categoryId,
         isActive: true,
-        isDeleted: false,
       },
     });
   }

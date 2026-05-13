@@ -28,8 +28,8 @@ type CommentRecord = {
 export class PrismaPostInteractionRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async findPostDetailById(postId: string, userId: string): Promise<PostDetailResponse | null> {
-    const post = await this.prisma.post.findFirst({
+  async findPostDetailById(postId: string, userId: string): Promise<PostDetailResponse> {
+    const post = await this.prisma.post.findUnique({
       where: {
         id: postId,
         isDeleted: false,
@@ -117,7 +117,7 @@ export class PrismaPostInteractionRepository {
     });
 
     if (!post) {
-      return null;
+      throw new NotFoundException('Post not found');
     }
 
     return {
@@ -128,7 +128,7 @@ export class PrismaPostInteractionRepository {
   }
 
   async toggleLikePost(userId: string, postId: string): Promise<LikeToggleResult> {
-    const post = await this.prisma.post.findFirst({
+    const post = await this.prisma.post.findUnique({
       where: {
         id: postId,
         isDeleted: false,
@@ -201,7 +201,7 @@ export class PrismaPostInteractionRepository {
   }
 
   async toggleBookmarkPost(userId: string, postId: string): Promise<BookmarkToggleResult> {
-    const post = await this.prisma.post.findFirst({
+    const post = await this.prisma.post.findUnique({
       where: {
         id: postId,
         isDeleted: false,
@@ -253,12 +253,11 @@ export class PrismaPostInteractionRepository {
     postId: string,
     platform: SharePlatform,
   ): Promise<PostShare & { shareCount: number }> {
-    const post = await this.prisma.post.findFirst({
+    const post = await this.prisma.post.findUnique({
       where: {
         id: postId,
-        isDeleted: false,
+
         isActive: true,
-        isDraft: false,
       },
       select: { id: true },
     });
@@ -294,7 +293,7 @@ export class PrismaPostInteractionRepository {
     content: string,
     parentId?: string,
   ): Promise<CommentNode> {
-    const post = await this.prisma.post.findFirst({
+    const post = await this.prisma.post.findUnique({
       where: {
         id: postId,
         isDeleted: false,

@@ -16,9 +16,7 @@ export class PostInteractionService {
   async getPostById(postId: string, userId: string): Promise<PostDetailResponse> {
     const post = await this.postInteractionRepository.findPostDetailById(postId, userId);
 
-    if (!post) {
-      throw new BadRequestException('Post not found');
-    }
+    
 
     return post;
   }
@@ -77,14 +75,9 @@ export class PostInteractionService {
   async deleteComment(userId: string, role: ROLE, commentId: string): Promise<void> {
     const comment = await this.postInteractionRepository.findCommentById(commentId);
 
-    if (!comment) {
-      throw new BadRequestException('Comment not found');
-    }
 
-    if (comment.userId !== userId && role !== ROLE.ADMIN) {
-      throw new UnauthorizedException('You are not authorized to delete this comment');
-    }
 
     await this.postInteractionRepository.deleteComment(userId, commentId);
+    return
   }
 }
