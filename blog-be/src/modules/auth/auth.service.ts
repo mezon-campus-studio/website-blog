@@ -45,8 +45,14 @@ export class AuthService {
 
       return await this.authRepository.updateLastLogin(user.id, new Date());
     } catch (error) {
+<<<<<<< HEAD:blog-be/src/modules/auth/auth.service.ts
       if (error instanceof UnauthorizedException) {
         
+=======
+      console.error('🔥 LOGIN CRASH ERROR:', error);
+      if (error instanceof UnauthorizedException) {
+        throw error;
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/auth/auth.service.ts
       }
 
       throw new InternalServerException('Failed to login');

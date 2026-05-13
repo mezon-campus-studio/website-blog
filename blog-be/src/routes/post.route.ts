@@ -9,6 +9,10 @@ import { validateDto } from '@/common/middleware/validate-dto.middleware';
 import { AttachTagsDto, CreatePostDto } from '@/modules/post/post.dto';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
 import { UpdatePostDto } from '@/modules/post/post.dto';
+<<<<<<< HEAD:blog-be/src/routes/post.route.ts
+=======
+import { authorize } from '@/common/middleware/authorize.middlerware';
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/routes/post.route.ts
 
 const postRouter = Router();
 const postRepository = new PrismaPostRepository(prisma);
@@ -43,9 +47,18 @@ postRouter.get(
   asyncHandler(postController.getReaderPostsByCategorySlug.bind(postController)),
 );
 
+<<<<<<< HEAD:blog-be/src/routes/post.route.ts
 postRouter.put(
   '/:postId',
   passportAuthenticateJwt,
+=======
+postRouter.get('/:postId', asyncHandler(postController.getPostById.bind(postController)));
+
+postRouter.use(passportAuthenticateJwt);
+
+postRouter.put(
+  '/:postId',
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/routes/post.route.ts
   uploadImage.fields([
     { name: 'thumbnail', maxCount: 1 },
     { name: 'images', maxCount: 10 },
@@ -54,6 +67,7 @@ postRouter.put(
   asyncHandler(postController.updatePost.bind(postController)),
 );
 
+<<<<<<< HEAD:blog-be/src/routes/post.route.ts
 postRouter.delete('/:postId', passportAuthenticateJwt, asyncHandler(postController.deletePost.bind(postController)));
 
 postRouter.patch(
@@ -67,11 +81,30 @@ postRouter.patch('/:postId/publish', passportAuthenticateJwt, asyncHandler(postC
 postRouter.get(
   '/draft',
   passportAuthenticateJwt,
+=======
+postRouter.delete('/:postId', asyncHandler(postController.deletePost.bind(postController)));
+
+postRouter.patch(
+  '/:postId/draft',
+
+  asyncHandler(postController.saveDraft.bind(postController)),
+);
+
+postRouter.patch('/:postId/publish', asyncHandler(postController.publishPost.bind(postController)));
+
+postRouter.get(
+  '/draft',
+
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/routes/post.route.ts
   asyncHandler(postController.getPostDraftByUserId.bind(postController)),
 );
 
 postRouter.get(
   '/published',
+<<<<<<< HEAD:blog-be/src/routes/post.route.ts
+=======
+  passportAuthenticateJwt,
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/routes/post.route.ts
   asyncHandler(postController.getPostPublishedByUserId.bind(postController)),
 );
 
@@ -79,22 +112,43 @@ postRouter.get('/hot', asyncHandler(postController.getHotsPost.bind(postControll
 
 postRouter.post(
   '/:postId/tags',
+<<<<<<< HEAD:blog-be/src/routes/post.route.ts
   passportAuthenticateJwt,
+=======
+  authorize('ADMIN', 'USER'),
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/routes/post.route.ts
   validateDto(AttachTagsDto),
   asyncHandler(postController.attachTagsToPost.bind(postController)),
 );
 
 postRouter.delete(
   '/:postId/tags/:tagId',
+<<<<<<< HEAD:blog-be/src/routes/post.route.ts
   passportAuthenticateJwt,
+=======
+  authorize('ADMIN', 'USER'),
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/routes/post.route.ts
   asyncHandler(postController.detachTagFromPost.bind(postController)),
 );
 
 postRouter.get(
   '/:postId/tags',
+<<<<<<< HEAD:blog-be/src/routes/post.route.ts
   asyncHandler(postController.getTagsByPostId.bind(postController)),
 );
 
 postRouter.get('/:postId', asyncHandler(postController.getPostById.bind(postController)));
+=======
+  authorize('ADMIN', 'USER'),
+  asyncHandler(postController.getTagsByPostId.bind(postController)),
+);
+
+postRouter.post(
+  '/upload',
+  passportAuthenticateJwt,
+  uploadImage.single('image'),
+  asyncHandler(postController.uploadImage.bind(postController)),
+);
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/routes/post.route.ts
 
 export default postRouter;

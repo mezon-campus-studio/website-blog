@@ -12,7 +12,11 @@ import { BadRequestException } from '@/common/utils/app-error';
 import { Env } from '@/config/env.config';
 
 export class PostService {
+<<<<<<< HEAD:blog-be/src/modules/post/post.service.ts
   constructor(private readonly postRepository: IPostRepository) {}
+=======
+  constructor(private readonly postRepository: IPostRepository) { }
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.service.ts
 
   async createPost(
     data: CreatePostDto,

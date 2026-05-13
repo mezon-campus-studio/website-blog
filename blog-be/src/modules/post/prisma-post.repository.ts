@@ -6,7 +6,11 @@ import { UpdatePostDto } from './post.dto';
 import { readerPostArgs, ReaderPostFilter, ReaderPostItem } from '@/types/post-reader.type';
 
 export class PrismaPostRepository implements IPostRepository {
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
   constructor(private readonly prisma: PrismaClient) {}
+=======
+  constructor(private readonly prisma: PrismaClient) { }
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
 
   async findBySlug(slug: string): Promise<Post | null> {
     return await this.prisma.post.findUnique({
@@ -61,6 +65,7 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
 
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
   async findPostById(postId: string): Promise<Post | null> {
     return await this.prisma.post.findUnique({
       where: {
@@ -69,6 +74,19 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
   async findAllPost(page: number, limit: number): Promise<Post[]> {
+=======
+  async findPostById(postId: string): Promise<any | null> {
+    return await this.prisma.post.findUnique({
+      where: {
+        id: postId,
+        isDeleted: false,
+        isActive: true,
+      },
+      ...readerPostArgs,
+    });
+  }
+  async findAllPost(page: number, limit: number): Promise<any[]> {
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
     return await this.prisma.post.findMany({
       where: {
         isDeleted: false,
@@ -80,10 +98,18 @@ export class PrismaPostRepository implements IPostRepository {
       orderBy: {
         createdAt: 'desc',
       },
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
     });
   }
 
   async findPostByUserId(page: number, limit: number, userId: string): Promise<Post[]> {
+=======
+      ...readerPostArgs,
+    });
+  }
+
+  async findPostByUserId(page: number, limit: number, userId: string): Promise<any[]> {
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
     return await this.prisma.post.findMany({
       where: {
         userId: userId,
@@ -95,6 +121,10 @@ export class PrismaPostRepository implements IPostRepository {
       },
       skip: (page - 1) * limit,
       take: limit,
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
+=======
+      ...readerPostArgs,
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
     });
   }
 
@@ -206,10 +236,19 @@ export class PrismaPostRepository implements IPostRepository {
     return posts;
   }
 
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
   async findCategoryById(categoryId: string): Promise<Category> {
     return await this.prisma.post.findMany({
       where: {
         categoryId,
+=======
+  async findCategoryById(categoryId: string): Promise<Category | null> {
+    return await this.prisma.category.findUnique({
+      where: {
+        id: categoryId,
+        isDeleted: false,
+        isActive: true,
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
       },
     });
   }
@@ -261,6 +300,7 @@ export class PrismaPostRepository implements IPostRepository {
     });
   }
 
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
   async findTagsByPostId(postId: string): Promise<string[]> {
     return await this.prisma.post.findUnique({
       where: {
@@ -269,11 +309,34 @@ export class PrismaPostRepository implements IPostRepository {
       include: {
         tags: {
           include: {
+=======
+  async findTagsByPostId(postId: string): Promise<Tag[]> {
+    const postWithTags = await this.prisma.post.findUnique({
+      where: {
+        id: postId,
+      },
+      select: {
+        tags: {
+          where: {
+            isDeleted: false,
+            isActive: true,
+            tag: {
+              isDeleted: false,
+              isActive: true,
+            },
+          },
+          select: {
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
             tag: true,
           },
         },
       },
     });
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
+=======
+
+    return postWithTags?.tags.map((t) => t.tag) || [];
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
   }
 
   async findPostByLikeCount(page: number, limit: number): Promise<Post[]> {
@@ -286,10 +349,17 @@ export class PrismaPostRepository implements IPostRepository {
         isActive: true,
         createdAt: {
           gte: thirtyDaysAgo,
+<<<<<<< HEAD:blog-be/src/modules/post/prisma-post.repository.ts
         },
       },
       orderBy: {
         likeCount: 'desc',
+=======
+        }
+      },
+      orderBy: {
+        likeCount: 'desc'
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/prisma-post.repository.ts
       },
       skip: (page - 1) * limit,
       take: limit,

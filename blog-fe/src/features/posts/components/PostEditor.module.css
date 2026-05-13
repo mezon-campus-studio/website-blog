@@ -1,0 +1,66 @@
+@reference "../../../app/globals.css";
+
+.editor {
+  @apply min-h-[400px] outline-none p-6 prose max-w-none;
+  /* Ép màu của tất cả thành phần trong editor theo màu chữ mặc định (giống y hệt thẻ Title) */
+  --tw-prose-body: var(--color-foreground);
+  --tw-prose-headings: var(--color-foreground);
+  --tw-prose-lead: var(--color-foreground);
+  --tw-prose-links: var(--color-primary);
+  --tw-prose-bold: var(--color-foreground);
+  --tw-prose-counters: var(--color-foreground);
+  --tw-prose-bullets: var(--color-foreground);
+  --tw-prose-hr: var(--color-card-border);
+  --tw-prose-quotes: var(--color-foreground);
+  --tw-prose-quote-borders: var(--color-card-border);
+  --tw-prose-captions: var(--color-muted-foreground);
+  --tw-prose-code: var(--color-foreground);
+  --tw-prose-pre-code: var(--color-foreground);
+  --tw-prose-pre-bg: var(--color-card-bg);
+  --tw-prose-th-borders: var(--color-card-border);
+  --tw-prose-td-borders: var(--color-card-border);
+}
+
+.toolbar {
+  @apply flex flex-wrap gap-1 p-2 border-b border-card-border bg-card-bg/30 sticky top-0 z-10 backdrop-blur-sm;
+}
+
+.toolbarBtn {
+  @apply p-2 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-all disabled:opacity-50;
+}
+
+.toolbarBtnActive {
+  @apply bg-primary/10 text-primary;
+}
+
+.editorContainer {
+  @apply border border-card-border rounded-xl overflow-hidden bg-card-bg/20 focus-within:border-primary/50 transition-colors;
+}
+
+:global(.ProseMirror) {
+  outline: none;
+  color: var(--color-foreground) !important;
+}
+
+:global(.ProseMirror) p,
+:global(.ProseMirror) h1,
+:global(.ProseMirror) h2,
+:global(.ProseMirror) h3,
+:global(.ProseMirror) h4,
+:global(.ProseMirror) li,
+:global(.ProseMirror) blockquote {
+  color: var(--color-foreground) !important;
+}
+
+:global(.ProseMirror p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+  @apply italic opacity-50;
+}
+
+:global(.ProseMirror img) {
+  @apply rounded-xl max-w-full h-auto my-6 border border-card-border;
+}

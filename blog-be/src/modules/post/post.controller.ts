@@ -5,7 +5,11 @@ import { UpdatePostDto } from './post.dto';
 import { HTTPSTATUS } from '@/config/http.config';
 
 export class PostController {
+<<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
   constructor(private readonly postService: PostService) {}
+=======
+  constructor(private readonly postService: PostService) { }
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.controller.ts
 
   async createPost(req: Request, res: Response, _next: NextFunction) {
     const userId = (req as any).user.id;
@@ -32,11 +36,19 @@ export class PostController {
       thumbnail?: Express.Multer.File[];
       images?: Express.Multer.File[];
     };
+<<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
     const postid = req.params.post_id as string;
     const post = await this.postService.updatePost(
       req.body as UpdatePostDto,
       userId,
       postid,
+=======
+    const postId = req.params.postId as string;
+    const post = await this.postService.updatePost(
+      req.body as UpdatePostDto,
+      userId,
+      postId,
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.controller.ts
       files.thumbnail?.[0],
       files.images,
     );
@@ -78,7 +90,11 @@ export class PostController {
 
   async deletePost(req: Request, res: Response, next: NextFunction) {
     const userId = (req as any).user.id;
+<<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
     const postId = req.params.post_id as string;
+=======
+    const postId = req.params.postId as string;
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.controller.ts
     await this.postService.deletePost(userId, postId);
     res.status(200).json({
       message: 'Post deleted successfully',
@@ -125,7 +141,11 @@ export class PostController {
     });
   }
 
+<<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
   async getHotsPost(req: Request, res: Response, _next: NextFunction){
+=======
+  async getHotsPost(req: Request, res: Response, _next: NextFunction) {
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.controller.ts
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const posts = await this.postService.getHotsPost(page, limit);
@@ -220,4 +240,22 @@ export class PostController {
       data: tags,
     });
   }
+<<<<<<< HEAD:blog-be/src/modules/post/post.controller.ts
+=======
+
+  async uploadImage(req: Request, res: Response) {
+    const file = req.file;
+    if (!file) {
+      return res.status(HTTPSTATUS.BAD_REQUEST).json({
+        message: 'No image file provided',
+      });
+    }
+
+    const uploadedImage = await this.postService.uploadImage(file);
+    res.status(200).json({
+      message: 'Image uploaded successfully',
+      data: uploadedImage,
+    });
+  }
+>>>>>>> d7dbd35d62c8cad1028ddc0dc74ec2049059ab0e:website-blog/blog-be/src/modules/post/post.controller.ts
 }
