@@ -2,23 +2,17 @@ import { Router } from 'express';
 import { AuthController } from '@/modules/auth/auth.controller';
 import { AuthService } from '@/modules/auth/auth.service';
 import { validateDto } from '@/common/middleware/validate-dto.middleware';
-import { SignUpDto } from '@/modules/auth/dto/signup.dto';
-import { SignInDto } from '@/modules/auth/dto/signin.dto';
+
 import { passportAuthenticateJwt } from '@/config/passport.config';
 import { PrismaAuthRepository } from '@/modules/auth/prisma-auth.repository';
 import prisma from '@/lib/prisma';
-import { Logger, loggers, transports, format } from 'winston';
 import { asyncHandler } from '@/common/middleware/async-handler.middleware';
+import { SignInDto, SignUpDto } from '@/modules/auth/auth.dto';
 
-loggers.add('auth', {
-  format: format.combine(format.timestamp(), format.json()),
-  transports: [new transports.Console()],
-});
-const logger = loggers.get('auth') as Logger;
 const authRouter = Router();
-const authRepository = new PrismaAuthRepository(prisma, logger);
-const authService = new AuthService(authRepository, logger);
-const authController = new AuthController(authService, logger);
+const authRepository = new PrismaAuthRepository(prisma);
+const authService = new AuthService(authRepository);
+const authController = new AuthController(authService);
 
 authRouter.post(
   '/register',

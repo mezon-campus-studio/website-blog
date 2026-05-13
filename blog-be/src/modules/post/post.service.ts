@@ -1,14 +1,15 @@
 import { IPostRepository } from './post.repository';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreatePostDto } from './post.dto';
 import { Post } from '@prisma/client';
 import slugify from 'slugify';
 import {
   deleteImageFromCloudinary,
-  uploadImageToCloudinary,
-  uploadThumbnailToCloudinary,
+  FolderType,
+  uploadToCloudinary,
 } from '@/common/utils/cloudinary';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { UpdatePostDto } from './post.dto';
 import { BadRequestException } from '@/common/utils/app-error';
+import { Env } from '@/config/env.config';
 
 export class PostService {
   constructor(private readonly postRepository: IPostRepository) {}
@@ -30,8 +31,12 @@ export class PostService {
       if (data.content.length < 10) {
         throw new BadRequestException('Content is too short');
       }
-      if (data.categoryId == null) {
+      const c = await this.postRepository.findCategoryById(data.categoryId);
+      if (data.categoryId == null && !c) {
         throw new BadRequestException('Category is required');
+      }
+      if (!c) {
+        throw new BadRequestException('Category not found');
       }
 
       let slug = slugify(data.title, {
@@ -42,13 +47,18 @@ export class PostService {
       const existedPost = await this.postRepository.findBySlug(slug);
 
       if (existedPost) {
-        slug = `${slug}-${Date.now()}`;
+        const suffix = `-${Date.now()}`;
+        slug = slug.slice(0, Env.MAX_SLUG_LENGTH - suffix.length);
+        slug = `${suffix}-${slug}`;
+      } else {
+        slug = slug.slice(0, Env.MAX_SLUG_LENGTH);
       }
 
       if (thumbnailFile) {
-        uploadedThumbnail = await uploadThumbnailToCloudinary(
+        uploadedThumbnail = await uploadToCloudinary(
           thumbnailFile.buffer,
           thumbnailFile.originalname,
+          FolderType.THUMBNAILS,
         );
 
         if (!uploadedThumbnail?.secureUrl || !uploadedThumbnail?.publicId) {
@@ -62,7 +72,11 @@ export class PostService {
 
       if (imageFiles?.length) {
         for (const file of imageFiles) {
-          const uploadedImage = await uploadImageToCloudinary(file.buffer, file.originalname);
+          const uploadedImage = await uploadToCloudinary(
+            file.buffer,
+            file.originalname,
+            FolderType.IMAGES,
+          );
           if (!uploadedImage?.secureUrl || !uploadedImage?.publicId) {
             throw new BadRequestException('Failed to upload image');
           }
@@ -113,10 +127,6 @@ export class PostService {
     return await this.postRepository.findPostByUserId(page, limit, userId);
   }
 
-  async getPostByCategoryId(page: number, limit: number, categoryId: string): Promise<Post[]> {
-    return await this.postRepository.findPostByCategoryId(page, limit, categoryId);
-  }
-
   async updatePost(
     data: UpdatePostDto,
     userId: string,
@@ -146,20 +156,23 @@ export class PostService {
         const existedPost = await this.postRepository.findBySlug(slug);
 
         if (existedPost) {
-          slug = `${slug}-${Date.now()}`;
+          const suffix = `-${Date.now()}`;
+          slug = slug.slice(0, Env.MAX_SLUG_LENGTH - suffix.length);
+          slug = `${suffix}-${slug}`;
+        } else {
+          slug = slug.slice(0, Env.MAX_SLUG_LENGTH);
         }
       }
 
       let thumbnailUrl = post.thumbnailUrl;
       let thumbnailPublicId = post.thumbnailPublicId;
+      const oldThumbnailPublicId = post.thumbnailPublicId;
 
       if (thumbnailFile) {
-        if (post.thumbnailPublicId) {
-          await deleteImageFromCloudinary(post.thumbnailPublicId);
-        }
-        uploadedThumbnail = await uploadThumbnailToCloudinary(
+        uploadedThumbnail = await uploadToCloudinary(
           thumbnailFile.buffer,
           thumbnailFile.originalname,
+          FolderType.THUMBNAILS,
         );
 
         if (!uploadedThumbnail?.secureUrl || !uploadedThumbnail?.publicId) {
@@ -171,16 +184,16 @@ export class PostService {
       }
 
       let images = (post.images as { url: string; publicId: string }[] | null) ?? [];
+      const oldImages = [...images];
 
       if (imageFiles?.length) {
-        for (const image of images) {
-          await deleteImageFromCloudinary(image.publicId);
-        }
-
         images = [];
-
         for (const file of imageFiles) {
-          const uploadedImage = await uploadImageToCloudinary(file.buffer, file.originalname);
+          const uploadedImage = await uploadToCloudinary(
+            file.buffer,
+            file.originalname,
+            FolderType.IMAGES,
+          );
           if (!uploadedImage?.secureUrl || !uploadedImage?.publicId) {
             throw new BadRequestException('Failed to upload image');
           }
@@ -192,7 +205,7 @@ export class PostService {
         }
       }
 
-      return await this.postRepository.updatePost(
+      const result = await this.postRepository.updatePost(
         {
           ...data,
           slug,
@@ -203,6 +216,18 @@ export class PostService {
         userId,
         postId,
       );
+
+      if (thumbnailFile && oldThumbnailPublicId) {
+        await deleteImageFromCloudinary(oldThumbnailPublicId);
+      }
+
+      if (imageFiles?.length) {
+        for (const image of oldImages) {
+          await deleteImageFromCloudinary(image.publicId);
+        }
+      }
+
+      return result;
     } catch (error) {
       if (uploadedThumbnail?.publicId) {
         await deleteImageFromCloudinary(uploadedThumbnail.publicId);
@@ -246,5 +271,45 @@ export class PostService {
     isDraft: boolean,
   ): Promise<Post[]> {
     return await this.postRepository.findPostByUserIdAndDraftStatus(page, limit, userId, isDraft);
+  }
+
+  async getHotsPost(page: number, limit: number): Promise<Post[]> {
+    return await this.postRepository.findPostByLikeCount(page, limit);
+  }
+  async getReaderPosts(page: number, limit: number, categoryId?: string, tagId?: string) {
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      categoryId,
+      tagId,
+    });
+  }
+
+  async getReaderPostsByTagId(page: number, limit: number, tagId: string) {
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      tagId,
+    });
+  }
+
+  async getReaderPostsByCategorySlug(page: number, limit: number, categorySlug: string) {
+    return await this.postRepository.findReaderPosts({
+      page,
+      limit,
+      categorySlug,
+    });
+  }
+
+  async attachTagsToPost(userId: string, postId: string, tagIds: string[]) {
+    return await this.postRepository.attachTagsToPost(userId, postId, tagIds);
+  }
+
+  async detachTagFromPost(postId: string, tagId: string) {
+    return await this.postRepository.detachTagFromPost(postId, tagId);
+  }
+
+  async getTagsByPostId(postId: string) {
+    return await this.postRepository.findTagsByPostId(postId);
   }
 }
