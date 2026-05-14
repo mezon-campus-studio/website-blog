@@ -15,13 +15,6 @@ export const readerPostArgs = Prisma.validator<Prisma.PostDefaultArgs>()({
         slug: true,
       },
     },
-    user: {
-      select: {
-        id: true,
-        name: true,
-        avatar_url: true,
-      },
-    },
     tags: {
       where: {
         isDeleted: false,

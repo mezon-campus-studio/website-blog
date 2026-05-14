@@ -28,9 +28,6 @@ export class PrismaSearchRepository implements ISearchRepository {
       orderBy: {
         createdAt: 'desc',
       },
-      include: {
-        category: true,
-      },
     });
     return result;
   }

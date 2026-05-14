@@ -3,9 +3,9 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { BadRequestException } from '@/common/utils/app-error';
 
-export const validateDto = (dtoClass: any) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    const dto = plainToInstance(dtoClass, req.body);
+export const validateDto = (dtoClass: any, type: 'body' | 'query' | 'params' = 'body') => {
+  return async (req: Request, _res: Response, next: NextFunction) => {
+    const dto = plainToInstance(dtoClass, req[type]);
     const errors = await validate(dto, {
       whitelist: true,
       forbidNonWhitelisted: true,
@@ -18,7 +18,7 @@ export const validateDto = (dtoClass: any) => {
       throw new BadRequestException(messages);
     }
 
-    req.body = dto;
+    Object.assign(req[type], dto);
     next();
   };
 };

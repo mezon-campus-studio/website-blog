@@ -12,10 +12,4 @@ export class SearchDto {
   @IsOptional()
   @IsString()
   tagId?: string;
-
-  @IsOptional()
-  page?: string;
-
-  @IsOptional()
-  limit?: string;
 }
