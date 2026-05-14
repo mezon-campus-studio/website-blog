@@ -4,6 +4,7 @@ import React from 'react';
 import { PostSection } from "@/components/sections/PostSection/PostSection";
 import { HeroSection } from "@/components/sections/HeroSection/HeroSection";
 import { useAllPosts, useHottestPosts } from "@/features/posts/hooks/usePosts";
+import { Post } from "@/features/posts/types";
 
 export function HomePostSections() {
   const [latestPage, setLatestPage] = React.useState(1);
