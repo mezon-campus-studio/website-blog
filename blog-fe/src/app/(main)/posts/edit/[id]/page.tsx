@@ -4,7 +4,12 @@ export const dynamic = 'force-dynamic';
 
 import React, { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { PostForm } from '@/features/posts/components/PostForm';
+import dynamic from 'next/dynamic';
+
+const PostForm = dynamic(() => import('@/features/posts/components/PostForm').then(mod => mod.PostForm), {
+  ssr: false,
+  loading: () => <div className="h-[600px] w-full bg-card-bg/20 animate-pulse rounded-3xl border border-card-border flex items-center justify-center text-muted-foreground">Preparing story editor...</div>
+});
 import { usePost, useUpdatePost } from '@/features/posts/hooks/usePostActions';
 import { Button } from '@/components/ui';
 import { Loader2, AlertCircle } from 'lucide-react';
