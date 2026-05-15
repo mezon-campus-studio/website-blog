@@ -32,25 +32,17 @@ export class PostController {
       thumbnail?: Express.Multer.File[];
       images?: Express.Multer.File[];
     };
-    const postid = req.params.postId as string;
+    const postId = req.params.postId as string;
     const post = await this.postService.updatePost(
       req.body as UpdatePostDto,
       userId,
-      postid,
+      postId,
       files.thumbnail?.[0],
       files.images,
     );
 
     res.status(200).json({
       message: 'Post updated successfully',
-      data: post,
-    });
-  }
-
-  async getPostById(req: Request, res: Response, next: NextFunction) {
-    const post = await this.postService.getPostById(req.params.postId as string);
-    res.status(200).json({
-      message: 'Post fetched successfully',
       data: post,
     });
   }
@@ -125,14 +117,14 @@ export class PostController {
     });
   }
 
-  async getHotsPost(req: Request, res: Response, _next: NextFunction){
+  async getHotsPost(req: Request, res: Response, _next: NextFunction) {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const posts = await this.postService.getHotsPost(page, limit);
     res.status(200).json({
       message: 'Posts fetch successfully',
-      data: posts
-    })
+      data: posts,
+    });
   }
   async getReaderPosts(req: Request, res: Response) {
     const page = parseInt(req.query.page as string) || 1;

@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { SharePlatform } from '@prisma/client';
 
 const normalizeStringArray = (value: unknown): string[] | unknown => {
   if (Array.isArray(value)) {
@@ -76,4 +77,20 @@ export class AttachTagsDto {
   @IsArray()
   @IsString({ each: true })
   tagIds!: string[];
+}
+
+export class CreateCommentDto {
+  @IsString()
+  @MinLength(1)
+  content!: string;
+
+  @IsOptional()
+  @IsString()
+  parentId?: string;
+}
+
+export class SharePostDto {
+  @IsOptional()
+  @IsEnum(SharePlatform)
+  platform?: SharePlatform;
 }

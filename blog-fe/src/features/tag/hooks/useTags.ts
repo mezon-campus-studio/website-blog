@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { Tag } from '../types';
 import { Post } from '@/features/posts/types';
+import { useAuthStore } from '@/features/auth/store/authStore';
 
 
 interface CreateTagPayload {
@@ -18,12 +19,14 @@ interface UpdateTagPayload {
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
 export function useAllTags() {
+  const user = useAuthStore((state) => state.user);
   return useQuery<Tag[], Error>({
     queryKey: ['tags', 'all'],
     queryFn: async () => {
       const { data } = await apiClient.get<{ data: Tag[] }>('/tag/all');
       return data.data || [];
     },
+    enabled: !!user,
   });
 }
 

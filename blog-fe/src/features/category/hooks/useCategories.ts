@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
 import { Category } from '../types';
 import { Post } from '@/features/posts/types';
+import { useAuthStore } from '@/features/auth/store/authStore';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -19,12 +20,14 @@ interface UpdateCategoryPayload {
 // ─── Queries ──────────────────────────────────────────────────────────────────
 
 export function useAllCategories() {
+   const user = useAuthStore((state) => state.user);
   return useQuery<Category[], Error>({
     queryKey: ['categories', 'all'],
     queryFn: async () => {
       const { data } = await apiClient.get<{ data: Category[] }>('/category/all');
       return data.data || [];
     },
+     enabled: !!user,
   });
 }
 

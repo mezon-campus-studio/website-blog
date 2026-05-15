@@ -15,6 +15,8 @@ const isPublicRoute = (url: string = '') => {
     '/signup',
     '/post/hot',
     '/category/all',
+    '/category/',
+    '/tag/all',
     '/tag',
     '/search'
   ];

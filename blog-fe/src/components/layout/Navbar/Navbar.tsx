@@ -32,20 +32,7 @@ export const Navbar = () => {
             >
               Home
             </Link>
-            <Link
-              href="/categories"
-              prefetch={false}
-              className={`${styles.link} ${pathname === "/categories" ? styles.active : ""}`}
-            >
-              Categories
-            </Link>
-            <Link
-              href="/tag"
-              prefetch={false}
-              className={`${styles.link} ${pathname === "/tag" ? styles.active : ""}`}
-            >
-              Tags
-            </Link>
+
             <Link
               href="#"
               prefetch={false}
@@ -55,14 +42,28 @@ export const Navbar = () => {
             </Link>
             {user && (
               <>
-                <Link 
-                  href="/posts/manage" 
+                <Link
+                  href="/categories"
+                  prefetch={false}
+                  className={`${styles.link} ${pathname === "/categories" ? styles.active : ""}`}
+                >
+                  Categories
+                </Link>
+                <Link
+                  href="/tag"
+                  prefetch={false}
+                  className={`${styles.link} ${pathname === "/tag" ? styles.active : ""}`}
+                >
+                  Tags
+                </Link>
+                <Link
+                  href="/posts/manage"
                   className={`${styles.link} ${pathname === "/posts/manage" ? styles.active : ""}`}
                 >
                   My Stories
                 </Link>
-                <Link 
-                  href="/profile/my-reports" 
+                <Link
+                  href="/profile/my-reports"
                   className={`${styles.link} ${pathname === "/profile/my-reports" ? styles.active : ""}`}
                 >
                   My Reports
@@ -95,7 +96,7 @@ export const Navbar = () => {
           >
             {theme === "light" ? "🌙" : "☀️"}
           </button>
-          
+
           {user ? (
             <div className="flex items-center gap-4">
               <Link href="/profile" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
