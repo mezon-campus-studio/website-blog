@@ -1,31 +1,20 @@
-<<<<<<< HEAD
-export const dynamic = 'force-dynamic';
-
-import React from 'react';
-import { EditPostClient } from './EditPostClient';
-
-export default function EditPostPage({ params }: { params: { id: string } }) {
-  return (
-    <div className="container py-12">
-      <EditPostClient id={params.id} />
-    </div>
-=======
 'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 import { usePost, useUpdatePost } from '@/features/posts/hooks/usePostActions';
 import { Button } from '@/components/ui';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-const PostForm = dynamic(() => import('@/features/posts/components/PostForm').then(mod => mod.PostForm), {
+const PostForm = dynamicImport(() => import('@/features/posts/components/PostForm').then(mod => mod.PostForm), {
   ssr: false,
   loading: () => <div className="h-[600px] w-full bg-card-bg/20 animate-pulse rounded-3xl border border-card-border flex items-center justify-center text-muted-foreground">Preparing story editor...</div>
 });
 
-export function EditPostClient({ id }: { id: string }) {
+export default function EditPostPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const id = params.id;
   const { data: post, isLoading, error } = usePost(id);
   const { mutate: updatePost, isPending: isUpdating } = useUpdatePost(id);
 
@@ -70,17 +59,18 @@ export function EditPostClient({ id }: { id: string }) {
   }
 
   return (
-    <PostForm 
-      initialData={{
-        title: post.title,
-        content: post.content,
-        categoryId: post.categoryId,
-        thumbnailUrl: post.thumbnailUrl || undefined,
-        tags: post.tags?.map((t) => t.tag.name) || [],
-      }}
-      onSubmit={handleSubmit}
-      isLoading={isUpdating}
-    />
->>>>>>> mezon/dev-fe
+    <div className="container py-12">
+      <PostForm 
+        initialData={{
+          title: post.title,
+          content: post.content,
+          categoryId: post.categoryId,
+          thumbnailUrl: post.thumbnailUrl || undefined,
+          tags: post.tags?.map((t) => t.tag.name) || [],
+        }}
+        onSubmit={handleSubmit}
+        isLoading={isUpdating}
+      />
+    </div>
   );
 }

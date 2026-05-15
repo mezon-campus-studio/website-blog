@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-export const dynamic = 'force-dynamic';
-
-import React from 'react';
-import { ProfileClient } from './ProfileClient';
-
-export default function ProfilePage() {
-  return <ProfileClient />;
-=======
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -17,7 +8,7 @@ import { Camera, Save, Lock, CheckCircle2, AlertCircle, Eye, EyeOff } from 'luci
 import Image from 'next/image';
 import { useUpdateProfile, useUpdateAvatar, useChangePassword } from '@/features/user/hooks';
 
-export function ProfileClient() {
+export default function ProfilePage() {
   const { user } = useAuth();
   const [name, setName] = useState(user?.name || '');
   const [bio, setBio] = useState(user?.bio || '');
@@ -362,5 +353,4 @@ export function ProfileClient() {
       </div>
     </ProtectedRoute>
   );
->>>>>>> mezon/dev-fe
 }

@@ -1,17 +1,11 @@
 'use client';
 
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Loader2 } from 'lucide-react';
 import { Input } from './Input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useSearch } from '@/features/search/hooks/useSearch';
 import { useDebounce } from '@/hooks/useDebounce';
-=======
-import React from 'react';
-import { Search } from 'lucide-react';
-import { Input } from './Input';
->>>>>>> mezon/dev-fe
 
 export interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onSearch?: (value: string) => void;
@@ -19,7 +13,6 @@ export interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputEle
 
 export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
   ({ className, onSearch, ...props }, ref) => {
-<<<<<<< HEAD
     const router = useRouter();
     const searchParams = useSearchParams();
     const [value, setValue] = useState(searchParams.get('q') || '');
@@ -108,17 +101,6 @@ export const SearchInput = React.forwardRef<HTMLInputElement, SearchInputProps>(
           </div>
         )}
       </div>
-=======
-    return (
-      <Input
-        ref={ref}
-        type="search"
-        placeholder="Search articles..."
-        startNode={<Search size={18} />}
-        className={className}
-        {...props}
-      />
->>>>>>> mezon/dev-fe
     );
   }
 );

@@ -1,13 +1,9 @@
 "use client";
-<<<<<<< HEAD
-import React from 'react';
-=======
->>>>>>> mezon/dev-fe
 
+import React from 'react';
 import { PostSection } from "@/components/sections/PostSection/PostSection";
 import { HeroSection } from "@/components/sections/HeroSection/HeroSection";
 import { useAllPosts, useHottestPosts } from "@/features/posts/hooks/usePosts";
-<<<<<<< HEAD
 import { Post } from "@/features/posts/types";
 
 export function HomePostSections() {
@@ -38,35 +34,16 @@ export function HomePostSections() {
     setLatestPage(prev => prev + 1);
   };
 
-=======
-
-export function HomePostSections() {
-  const { data: latestPosts, isLoading: isLoadingLatest } = useAllPosts();
-  const { data: hottestPosts, isLoading: isLoadingHottest } = useHottestPosts();
-
-  // Pick the absolute hottest post as the Hero Section featured insight
-  const featuredPost = hottestPosts?.[0];
-  
-  // Slice to only show a single row (e.g., top 6) excluding the featured post if it's in the hottest
-  const latestRow = latestPosts?.slice(0, 6) || [];
-  const hottestRow = hottestPosts?.slice(1, 7) || [];
-
->>>>>>> mezon/dev-fe
   return (
     <>
       <HeroSection post={featuredPost} />
       
       <PostSection 
         title="The Latest Chronicles" 
-<<<<<<< HEAD
         posts={allLatestPosts} 
         isLoading={isLoadingLatest && latestPage === 1}
         isFetchingMore={isFetchingLatest}
         onLoadMore={handleLoadMoreLatest}
-=======
-        posts={latestRow} 
-        isLoading={isLoadingLatest} 
->>>>>>> mezon/dev-fe
       />
       <PostSection 
         title="Hottest Chronicles" 
