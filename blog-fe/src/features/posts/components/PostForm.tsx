@@ -2,7 +2,12 @@
 
 import React, { useState, useRef } from 'react';
 import { Button, Input, Card, CardContent } from '@/components/ui';
-import { PostEditor } from './PostEditor';
+import dynamic from 'next/dynamic';
+
+const PostEditor = dynamic(() => import('./PostEditor').then(mod => mod.PostEditor), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-card-bg/20 animate-pulse rounded-xl border border-card-border flex items-center justify-center text-muted-foreground">Loading editor...</div>
+});
 import { useCategories, useTags } from '../hooks/useMetadata';
 import { Camera, Save, Send, ChevronLeft, Tag as TagIcon, Layout } from 'lucide-react';
 import Image from 'next/image';

@@ -11,8 +11,8 @@ export const apiClient = axios.create({
 // Helper to check if a route is public
 const isPublicRoute = (url: string = '') => {
   const publicPaths = [
-    '/auth/login',
-    '/auth/register',
+    '/signin',
+    '/signup',
     '/post/hot',
     '/category/all',
     '/tag',

@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-export const dynamic = 'force-dynamic';
-
-import React from 'react';
-import { ManagePostsClient } from './ManagePostsClient';
-
-export default function ManagePostsPage() {
-  return <ManagePostsClient />;
-=======
 'use client';
 
 import React, { useState, Suspense } from 'react';
@@ -167,5 +158,4 @@ export function ManagePostsClient() {
       <ManagePostsContent />
     </Suspense>
   );
->>>>>>> mezon/dev-fe
 }
