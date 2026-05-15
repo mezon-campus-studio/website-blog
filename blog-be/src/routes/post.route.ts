@@ -145,6 +145,7 @@ postRouter.get(
 
 postRouter.get(
   '/:postId',
+  passportAuthenticateJwt,
   asyncHandler(postInteractionController.getPostById.bind(postInteractionController)),
 );
 
