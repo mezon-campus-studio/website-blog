@@ -13,7 +13,6 @@ export interface Post {
   createdAt: string;
   updatedAt: string;
 }
-<<<<<<< HEAD
 
 export interface Comment {
   id: string;
@@ -42,5 +41,3 @@ export interface Report {
   post?: { id: string; title: string; userId: string; user?: { name: string; email?: string } };
   user?: { id: string; name: string; email: string };
 }
-=======
->>>>>>> mezon/dev-fe

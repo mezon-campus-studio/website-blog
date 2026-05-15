@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-export const dynamic = 'force-dynamic';
-
-import React from 'react';
-import { EditPostClient } from './EditPostClient';
-
-export default function EditPostPage({ params }: { params: { id: string } }) {
-  return (
-    <div className="container py-12">
-      <EditPostClient id={params.id} />
-    </div>
-=======
 'use client';
 
 import React from 'react';
@@ -81,6 +69,10 @@ export function EditPostClient({ id }: { id: string }) {
       onSubmit={handleSubmit}
       isLoading={isUpdating}
     />
->>>>>>> mezon/dev-fe
   );
 }
+
+export default function EditPostPage({ params }: { params: { id: string } }) {
+  return <EditPostClient id={params.id} />;
+}
+
