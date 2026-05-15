@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,8 +9,6 @@ import { useDarkMode } from "@/hooks/useDarkMode";
 import { useAuth, useLogout } from "@/features/auth/hooks";
 import { LogOut, User as UserIcon, LayoutDashboard } from "lucide-react";
 import RoleGate from "@/components/auth/RoleGate";
-import { NotificationBell } from "@/features/notifications/components/NotificationBell";
-
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useDarkMode();
@@ -48,12 +47,20 @@ export const Navbar = () => {
               About
             </Link>
             {user && (
-              <Link 
-                href="/posts/manage" 
-                className={`${styles.link} ${pathname === "/posts/manage" ? styles.active : ""}`}
-              >
-                My Stories
-              </Link>
+              <>
+                <Link 
+                  href="/posts/manage" 
+                  className={`${styles.link} ${pathname === "/posts/manage" ? styles.active : ""}`}
+                >
+                  My Stories
+                </Link>
+                <Link 
+                  href="/profile/my-reports" 
+                  className={`${styles.link} ${pathname === "/profile/my-reports" ? styles.active : ""}`}
+                >
+                  My Reports
+                </Link>
+              </>
             )}
             <RoleGate allowedRoles={['ADMIN']}>
               <Link 
@@ -82,9 +89,6 @@ export const Navbar = () => {
             {theme === "light" ? "🌙" : "☀️"}
           </button>
           
-          {user && <NotificationBell />}
-
-
           {user ? (
             <div className="flex items-center gap-4">
               <Link href="/profile" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">

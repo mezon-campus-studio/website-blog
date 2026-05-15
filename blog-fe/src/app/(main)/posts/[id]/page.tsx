@@ -1,12 +1,17 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { usePost } from '@/features/posts/hooks/usePostActions';
 import { Button } from '@/components/ui';
-import { Loader2, AlertCircle, Calendar, Clock, User, ChevronLeft, Share2 } from 'lucide-react';
+import { Loader2, AlertCircle, Calendar, Clock, ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { PostInteractions } from '@/features/posts/components/PostInteractions';
+import apiClient from '@/lib/api-client';
+import { useUserProfile } from '@/features/auth/hooks/useUserProfile';
 
 export default function PostDetailPage() {
   const params = useParams();
@@ -14,6 +19,11 @@ export default function PostDetailPage() {
   const router = useRouter();
 
   const { data: post, isLoading, error } = usePost(id);
+  
+  // Optimized: Use centralized hook with caching
+  const { data: authorProfile } = useUserProfile(post?.userId || '');
+
+  const displayAuthorName = post?.user?.name || authorProfile?.name || 'Unknown Author';
 
   if (isLoading) {
     return (
@@ -89,12 +99,12 @@ export default function PostDetailPage() {
               {post.title}
             </h1>
             <div className="flex flex-wrap items-center gap-6 text-sm font-medium">
-              <div className="flex items-center gap-2">
+              <Link href={`/users/${post.userId}`} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold border border-primary/20">
-                  {post.user?.name.charAt(0)}
+                   {displayAuthorName.charAt(0)}
                 </div>
-                <span>{post.user?.name}</span>
-              </div>
+                <span>{displayAuthorName}</span>
+              </Link>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar size={16} />
                 {formattedDate}
@@ -112,27 +122,26 @@ export default function PostDetailPage() {
       <div className="container mx-auto max-w-4xl px-4 mt-12">
         <div className="flex flex-col lg:flex-row gap-12">
           <main className="flex-grow">
+            {/* Category tag */}
+            {post.categoryId && (
+              <div className="mb-6">
+                <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-widest">
+                  {post.category?.name || 'Story'}
+                </span>
+              </div>
+            )}
+
             <div 
               className="prose prose-invert prose-lg max-w-none prose-headings:font-black prose-p:text-muted-foreground/90 prose-strong:text-foreground prose-a:text-primary"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
-            
-            <div className="mt-16 pt-8 border-t border-card-border flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Share this story:</span>
-                <button className="p-2 hover:bg-card-bg rounded-lg transition-colors"><Share2 size={18} /></button>
-              </div>
-              <div className="flex items-center gap-2">
-                {post.categoryId && (
-                  <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-widest">
-                    {post.category?.name || 'Story'}
-                  </span>
-                )}
-              </div>
-            </div>
+
+            {/* Like / Comment / Report */}
+            <PostInteractions postId={post.id} postTitle={post.title} />
           </main>
         </div>
       </div>
     </article>
   );
 }
+

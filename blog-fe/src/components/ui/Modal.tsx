@@ -62,15 +62,15 @@ export const Modal: React.FC<ModalProps> = ({
         aria-modal="true"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex flex-col gap-spacing-md">
+        <div className="flex flex-col gap-4">
           {/* Header */}
           {(title || showCloseButton) && (
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-b border-card-border pb-3">
               {title && <h3 className="text-xl font-bold text-foreground">{title}</h3>}
               {showCloseButton && (
                 <button
                   onClick={onClose}
-                  className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ml-auto"
                   aria-label="Close modal"
                 >
                   <X size={20} />

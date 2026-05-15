@@ -1,4 +1,5 @@
 // app/(main)/page.tsx
+export const dynamic = 'force-dynamic';
 import { Suspense } from "react";
 import { HomePostSections } from "./HomePostSections";
 import { Newsletter } from "@/components/sections/Newsletter/Newsletter";

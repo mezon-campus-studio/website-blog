@@ -7,9 +7,11 @@ interface PostSectionProps {
   title: string;
   posts: Post[];
   isLoading?: boolean;
+  isFetchingMore?: boolean;
+  onLoadMore?: () => void;
 }
 
-export const PostSection = ({ title, posts, isLoading }: PostSectionProps) => {
+export const PostSection = ({ title, posts, isLoading, isFetchingMore, onLoadMore }: PostSectionProps) => {
   if (isLoading) {
     return (
       <section className={styles.section}>
@@ -45,9 +47,17 @@ export const PostSection = ({ title, posts, isLoading }: PostSectionProps) => {
       </div>
 
       {/* Footer */}
-      <div className={styles.footer}>
-        <Button variant="outline">Load More Archive Entries</Button>
-      </div>
+      {onLoadMore && (
+        <div className={styles.footer}>
+          <Button 
+            variant="outline" 
+            onClick={onLoadMore}
+            disabled={isFetchingMore}
+          >
+            {isFetchingMore ? "Unfolding more stories..." : "Load More Archive Entries"}
+          </Button>
+        </div>
+      )}
     </section>
   );
 };

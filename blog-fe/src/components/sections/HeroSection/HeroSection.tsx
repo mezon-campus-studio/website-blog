@@ -1,8 +1,11 @@
+"use client";
+import React from "react";
 import styles from "./HeroSection.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui";
 import { Post } from "@/features/posts/types";
+import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
 
 interface HeroSectionProps {
   post?: Post;
@@ -11,6 +14,9 @@ interface HeroSectionProps {
 const stripHtml = (html: string) => html.replace(/<[^>]*>?/gm, '');
 
 export const HeroSection = ({ post }: HeroSectionProps) => {
+  // Optimized: Use centralized hook with caching
+  const { data: authorProfile } = useUserProfile(post?.userId || '');
+
   if (!post) {
     return (
       <section className={`${styles.section} animate-pulse bg-muted/10 h-[500px]`}></section>
@@ -19,8 +25,8 @@ export const HeroSection = ({ post }: HeroSectionProps) => {
 
   const fallbackImage = "https://images.unsplash.com/photo-1492724441997-5dc865305da7";
   const imageUrl = post.thumbnailUrl || fallbackImage;
-  const authorAvatar = post.user?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(post.user?.name || 'User');
-  const authorName = post.user?.name || "Unknown Author";
+  const authorName = post.user?.name || authorProfile?.name || "Unknown Author";
+  const authorAvatar = post.user?.avatar_url || authorProfile?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(authorName);
 
   const plainTextContent = stripHtml(post.content || "");
   const excerpt = plainTextContent.length > 200 
@@ -55,7 +61,7 @@ export const HeroSection = ({ post }: HeroSectionProps) => {
           </p>
 
           {/* Author */}
-          <div className={styles.author}>
+          <Link href={`/users/${post.userId}`} className={`${styles.author} hover:opacity-80 transition-opacity`}>
             <Image
               src={authorAvatar}
               alt="Author avatar"
@@ -69,7 +75,7 @@ export const HeroSection = ({ post }: HeroSectionProps) => {
                 Author
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Action */}
           <div className={styles.action}>

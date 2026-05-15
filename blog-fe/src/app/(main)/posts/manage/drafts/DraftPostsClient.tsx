@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-export const dynamic = 'force-dynamic';
-
-import React from 'react';
-import { DraftPostsClient } from './DraftPostsClient';
-
-export default function DraftPostsPage() {
-  return <DraftPostsClient />;
-=======
 'use client';
 
 import React, { Suspense } from 'react';
@@ -97,5 +88,4 @@ export function DraftPostsClient() {
       <DraftPostsContent />
     </Suspense>
   );
->>>>>>> mezon/dev-fe
 }

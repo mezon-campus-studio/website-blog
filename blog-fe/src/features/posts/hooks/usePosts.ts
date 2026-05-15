@@ -70,11 +70,11 @@ export function useMyPosts(status?: 'draft' | 'published') {
   });
 }
 
-export function useAllPosts() {
+export function useAllPosts(page = 1, limit = 10) {
   return useQuery<Post[], Error>({
-    queryKey: ['posts', 'all'],
+    queryKey: ['posts', 'all', page, limit],
     queryFn: async () => {
-      const { data } = await apiClient.get<{ data: Post[] }>('/post');
+      const { data } = await apiClient.get<{ data: Post[] }>(`/post?page=${page}&limit=${limit}`);
       return data.data || [];
     },
   });
