@@ -14,7 +14,7 @@ const isPublicRoute = (url: string = '') => {
     '/auth/login',
     '/auth/register',
     '/post/hot',
-    '/category',
+    '/category/all',
     '/tag',
     '/search'
   ];
@@ -40,7 +40,7 @@ apiClient.interceptors.response.use(
     const status = error.response?.status;
     const url = error.config?.url || '';
     const isPublic = isPublicRoute(url);
-    
+
     // Log detailed error info for debugging
     if (error.response) {
       console.error(`❌ API Error [${status}] on ${url}`);

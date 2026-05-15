@@ -27,37 +27,44 @@ export const Navbar = () => {
           </Link>
 
           <div className={styles.links}>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className={`${styles.link} ${pathname === "/" ? styles.active : ""}`}
             >
               Home
             </Link>
-            <Link 
-              href="#" 
+            <Link
+              href="/categories"
               prefetch={false}
               className={`${styles.link} ${pathname === "/categories" ? styles.active : ""}`}
             >
               Categories
             </Link>
-            <Link 
-              href="#" 
+            <Link
+              href="/tag"
+              prefetch={false}
+              className={`${styles.link} ${pathname === "/tag" ? styles.active : ""}`}
+            >
+              Tags
+            </Link>
+            <Link
+              href="#"
               prefetch={false}
               className={`${styles.link} ${pathname === "/about" ? styles.active : ""}`}
             >
               About
             </Link>
             {user && (
-              <Link 
-                href="/posts/manage" 
+              <Link
+                href="/posts/manage"
                 className={`${styles.link} ${pathname === "/posts/manage" ? styles.active : ""}`}
               >
                 My Stories
               </Link>
             )}
             <RoleGate allowedRoles={['ADMIN']}>
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className={`${styles.link} ${pathname === "/dashboard" ? styles.active : ""}`}
               >
                 <LayoutDashboard size={14} className="inline mr-1" />
@@ -81,7 +88,7 @@ export const Navbar = () => {
           >
             {theme === "light" ? "🌙" : "☀️"}
           </button>
-          
+
           {user && <NotificationBell />}
 
 
@@ -91,7 +98,7 @@ export const Navbar = () => {
                 <UserIcon size={18} />
                 <span>{user.name}</span>
               </Link>
-              <button 
+              <button
                 onClick={() => logout()}
                 className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                 title="Log out"
