@@ -142,6 +142,7 @@ export default function PostDetailPage() {
               postId={post.id} 
               postTitle={post.title} 
               initialLiked={post.isLiked}
+              initialBookmarked={post.isBookmarked}
               initialLikeCount={post._count?.likes}
               commentCount={post._count?.comments}
             />

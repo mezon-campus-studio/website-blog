@@ -15,8 +15,8 @@ export function useLikePost(postId: string) {
 
   return useMutation<LikeToggleResult, Error>({
     mutationFn: async () => {
-      const { data } = await apiClient.post<LikeToggleResult>(`/post/${postId}/like`);
-      return data;
+      const { data } = await apiClient.post<{ data: LikeToggleResult }>(`/post/${postId}/like`);
+      return data.data;
     },
     onSuccess: () => {
       // Invalidate both the post detail and potentially lists
@@ -32,8 +32,8 @@ export function useBookmarkPost(postId: string) {
 
   return useMutation<BookmarkToggleResult, Error>({
     mutationFn: async () => {
-      const { data } = await apiClient.post<BookmarkToggleResult>(`/post/${postId}/bookmark`);
-      return data;
+      const { data } = await apiClient.post<{ data: BookmarkToggleResult }>(`/post/${postId}/bookmark`);
+      return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts', postId] });
@@ -48,8 +48,8 @@ export function useSharePost(postId: string) {
 
   return useMutation<SharePostResult, Error, { platform?: SharePlatform }>({
     mutationFn: async ({ platform }) => {
-      const { data } = await apiClient.post<SharePostResult>(`/post/${postId}/share`, { platform });
-      return data;
+      const { data } = await apiClient.post<{ data: SharePostResult }>(`/post/${postId}/share`, { platform });
+      return data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['posts', postId] });
@@ -62,10 +62,10 @@ export function useComments(postId: string, page = 1, limit = 10) {
   return useQuery<CommentListResponse, Error>({
     queryKey: ['comments', postId, page, limit],
     queryFn: async () => {
-      const { data } = await apiClient.get<CommentListResponse>(`/post/${postId}/comments`, {
+      const { data } = await apiClient.get<{ data: CommentListResponse }>(`/post/${postId}/comments`, {
         params: { page, limit },
       });
-      return data;
+      return data.data;
     },
     enabled: !!postId,
   });

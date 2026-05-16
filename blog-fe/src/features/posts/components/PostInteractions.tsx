@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Flag } from 'lucide-react';
-import { useLikePost } from '../hooks/usePostInteractions';
+import { Heart, MessageCircle, Flag, Bookmark } from 'lucide-react';
+import { useLikePost, useBookmarkPost } from '../hooks/usePostInteractions';
 import { CommentSection } from './CommentSection';
 import { ReportModal } from './ReportModal';
 import { useAuthStore } from '@/features/auth/store/authStore';
@@ -12,6 +12,7 @@ interface PostInteractionsProps {
   postId: string;
   postTitle?: string;
   initialLiked?: boolean;
+  initialBookmarked?: boolean;
   initialLikeCount?: number;
   commentCount?: number;
 }
@@ -20,19 +21,23 @@ export function PostInteractions({
   postId, 
   postTitle, 
   initialLiked = false, 
+  initialBookmarked = false,
   initialLikeCount = 0,
   commentCount = 0
 }: PostInteractionsProps) {
   const { mutate: toggleLike, isPending: isLiking } = useLikePost(postId);
+  const { mutate: toggleBookmark, isPending: isBookmarking } = useBookmarkPost(postId);
   
   // Use local state for immediate feedback, but sync with props
   const [isLiked, setIsLiked] = useState(initialLiked);
+  const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [likesCount, setLikesCount] = useState(initialLikeCount);
 
   useEffect(() => {
     setIsLiked(initialLiked);
+    setIsBookmarked(initialBookmarked);
     setLikesCount(initialLikeCount);
-  }, [initialLiked, initialLikeCount]);
+  }, [initialLiked, initialBookmarked, initialLikeCount]);
 
   const [showComments, setShowComments] = useState(false);
   const [showReport, setShowReport] = useState(false);
@@ -68,6 +73,25 @@ export function PostInteractions({
     });
   };
 
+  const handleBookmark = () => {
+    if (!user) {
+      router.push('/signin');
+      return;
+    }
+    if (isBookmarking) return;
+
+    // Optimistic update
+    const newBookmarked = !isBookmarked;
+    setIsBookmarked(newBookmarked);
+
+    toggleBookmark(undefined, {
+      onError: () => {
+        // Revert on error
+        setIsBookmarked(isBookmarked);
+      }
+    });
+  };
+
   return (
     <>
       {/* Interaction Bar */}
@@ -89,6 +113,24 @@ export function PostInteractions({
             className={`transition-all ${isLiked ? 'fill-pink-500 scale-110' : 'group-hover:scale-110'}`}
           />
           <span>{likesCount}</span>
+        </button>
+
+        {/* Bookmark */}
+        <button
+          id="bookmark-button"
+          onClick={handleBookmark}
+          disabled={isBookmarking}
+          className={`group flex items-center gap-2 px-4 py-2.5 rounded-full font-bold text-xs uppercase tracking-widest transition-all ${
+            isBookmarked
+              ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20'
+              : 'bg-card-bg/60 text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 border border-card-border'
+          }`}
+          title={isBookmarked ? 'Remove Bookmark' : 'Bookmark'}
+        >
+          <Bookmark
+            size={16}
+            className={`transition-all ${isBookmarked ? 'fill-amber-500 scale-110' : 'group-hover:scale-110'}`}
+          />
         </button>
 
         {/* Comment toggle */}
@@ -119,6 +161,7 @@ export function PostInteractions({
           <span className="hidden sm:inline">Report</span>
         </button>
       </div>
+
 
       {/* Comment Section */}
       {showComments && (
