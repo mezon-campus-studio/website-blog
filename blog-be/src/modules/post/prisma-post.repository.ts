@@ -68,6 +68,7 @@ export class PrismaPostRepository implements IPostRepository {
       },
     });
   }
+
   async findAllPost(page: number, limit: number): Promise<Post[]> {
     return await this.prisma.post.findMany({
       where: {
@@ -206,10 +207,11 @@ export class PrismaPostRepository implements IPostRepository {
     return posts;
   }
 
-  async findCategoryById(categoryId: string): Promise<Category> {
-    return await this.prisma.post.findMany({
+  async findCategoryById(categoryId: string): Promise<Category | null> {
+    return await this.prisma.category.findUnique({
       where: {
-        categoryId,
+        id: categoryId,
+        isActive: true,
       },
     });
   }
@@ -262,7 +264,7 @@ export class PrismaPostRepository implements IPostRepository {
   }
 
   async findTagsByPostId(postId: string): Promise<string[]> {
-    return await this.prisma.post.findUnique({
+    const post = await this.prisma.post.findFirst({
       where: {
         id: postId,
       },
@@ -274,6 +276,18 @@ export class PrismaPostRepository implements IPostRepository {
         },
       },
     });
+
+    const tags = (post?.tags ?? []) as Array<{
+      isDeleted: boolean;
+      isActive: boolean;
+      tag: {
+        name: string;
+      } | null;
+    }>;
+
+    return tags
+      .filter((item) => item.tag !== null && !item.isDeleted && item.isActive)
+      .map((item) => item.tag!.name);
   }
 
   async findPostByLikeCount(page: number, limit: number): Promise<Post[]> {

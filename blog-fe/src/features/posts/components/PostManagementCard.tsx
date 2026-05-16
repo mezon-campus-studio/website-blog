@@ -46,6 +46,8 @@ export const PostManagementCard: React.FC<PostManagementCardProps> = ({ post, on
               src={post.thumbnailUrl}
               alt={post.title}
               fill
+              sizes="(max-width: 640px) 100vw, 192px"
+              loading="eager"
               className="object-cover group-hover:scale-110 transition-transform duration-700"
             />
           ) : (

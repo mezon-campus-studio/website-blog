@@ -111,14 +111,6 @@ export class PostService {
     }
   }
 
-  async getPostById(postId: string): Promise<Post> {
-    const post = await this.postRepository.findPostById(postId);
-    if (!post) {
-      throw new BadRequestException('Post not found');
-    }
-    return post;
-  }
-
   async getAllPost(page: number, limit: number): Promise<Post[]> {
     return await this.postRepository.findAllPost(page, limit);
   }

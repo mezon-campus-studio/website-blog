@@ -354,3 +354,6 @@ export default function ProfilePage() {
     </ProtectedRoute>
   );
 }
+export default function ProfilePage() {
+  return <ProfileClient />;
+}

@@ -79,6 +79,7 @@ export default function PostDetailPage() {
             alt={post.title}
             fill
             priority
+            sizes="100vw"
             className="object-cover"
           />
         ) : (

@@ -48,7 +48,6 @@ export interface IPostRepository {
     isDraft: boolean,
   ): Promise<Post[]>;
 
-
   findPostByLikeCount(page: number, limit: number): Promise<Post[]>;
 
   findReaderPosts(filter: ReaderPostFilter): Promise<ReaderPostItem[]>;

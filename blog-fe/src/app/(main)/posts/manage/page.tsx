@@ -159,3 +159,6 @@ export default function ManagePostsPage() {
     </Suspense>
   );
 }
+export default function ManagePostsPage() {
+  return <ManagePostsClient />;
+}

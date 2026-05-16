@@ -26,21 +26,15 @@ export const Navbar = () => {
           </Link>
 
           <div className={styles.links}>
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className={`${styles.link} ${pathname === "/" ? styles.active : ""}`}
             >
               Home
             </Link>
-            <Link 
-              href="#" 
-              prefetch={false}
-              className={`${styles.link} ${pathname === "/categories" ? styles.active : ""}`}
-            >
-              Categories
-            </Link>
-            <Link 
-              href="#" 
+
+            <Link
+              href="#"
               prefetch={false}
               className={`${styles.link} ${pathname === "/about" ? styles.active : ""}`}
             >
@@ -48,14 +42,28 @@ export const Navbar = () => {
             </Link>
             {user && (
               <>
-                <Link 
-                  href="/posts/manage" 
+                <Link
+                  href="/categories"
+                  prefetch={false}
+                  className={`${styles.link} ${pathname === "/categories" ? styles.active : ""}`}
+                >
+                  Categories
+                </Link>
+                <Link
+                  href="/tag"
+                  prefetch={false}
+                  className={`${styles.link} ${pathname === "/tag" ? styles.active : ""}`}
+                >
+                  Tags
+                </Link>
+                <Link
+                  href="/posts/manage"
                   className={`${styles.link} ${pathname === "/posts/manage" ? styles.active : ""}`}
                 >
                   My Stories
                 </Link>
-                <Link 
-                  href="/profile/my-reports" 
+                <Link
+                  href="/profile/my-reports"
                   className={`${styles.link} ${pathname === "/profile/my-reports" ? styles.active : ""}`}
                 >
                   My Reports
@@ -63,8 +71,8 @@ export const Navbar = () => {
               </>
             )}
             <RoleGate allowedRoles={['ADMIN']}>
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className={`${styles.link} ${pathname === "/dashboard" ? styles.active : ""}`}
               >
                 <LayoutDashboard size={14} className="inline mr-1" />
@@ -90,14 +98,14 @@ export const Navbar = () => {
           >
             {theme === "light" ? "🌙" : "☀️"}
           </button>
-          
+
           {user ? (
             <div className="flex items-center gap-4">
               <Link href="/profile" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
                 <UserIcon size={18} />
                 <span>{user.name}</span>
               </Link>
-              <button 
+              <button
                 onClick={() => logout()}
                 className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                 title="Log out"
