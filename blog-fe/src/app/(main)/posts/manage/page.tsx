@@ -152,13 +152,10 @@ function ManagePostsContent() {
   );
 }
 
-export function ManagePostsClient() {
+export default function ManagePostsPage() {
   return (
     <Suspense fallback={<div>Loading management...</div>}>
       <ManagePostsContent />
     </Suspense>
   );
-}
-export default function ManagePostsPage() {
-  return <ManagePostsClient />;
 }

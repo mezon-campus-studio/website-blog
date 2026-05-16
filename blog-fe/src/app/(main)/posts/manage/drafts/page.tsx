@@ -82,14 +82,10 @@ function DraftPostsContent() {
   );
 }
 
-export function DraftPostsClient() {
+export default function DraftPostsPage() {
   return (
     <Suspense fallback={<div>Loading drafts...</div>}>
       <DraftPostsContent />
     </Suspense>
   );
-}
-
-export default function DraftsPage() {
-  return <DraftPostsClient />;
 }

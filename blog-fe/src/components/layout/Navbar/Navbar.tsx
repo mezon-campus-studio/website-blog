@@ -84,7 +84,9 @@ export const Navbar = () => {
 
         {/* CENTER */}
         <div className={styles.center}>
-          <SearchInput />
+          <React.Suspense fallback={<div className="w-full max-w-sm h-10 bg-muted/20 animate-pulse rounded-lg" />}>
+            <SearchInput />
+          </React.Suspense>
         </div>
 
         {/* RIGHT */}

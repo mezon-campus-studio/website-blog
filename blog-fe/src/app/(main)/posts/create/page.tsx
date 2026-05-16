@@ -2,15 +2,15 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 import { useCreatePost } from '@/features/posts/hooks/usePosts';
 
-const PostForm = dynamic(() => import('@/features/posts/components/PostForm').then(mod => mod.PostForm), {
+const PostForm = dynamicImport(() => import('@/features/posts/components/PostForm').then(mod => mod.PostForm), {
   ssr: false,
   loading: () => <div className="h-[600px] w-full bg-card-bg/20 animate-pulse rounded-3xl border border-card-border flex items-center justify-center text-muted-foreground">Preparing workspace...</div>
 });
 
-export function CreatePostClient() {
+export default function CreatePostPage() {
   const router = useRouter();
   const { mutate: createPost, isPending } = useCreatePost();
 
@@ -26,9 +26,9 @@ export function CreatePostClient() {
     });
   };
 
-  return <PostForm onSubmit={handleSubmit} isLoading={isPending} />;
-}
-
-export default function CreatePostPage() {
-  return <CreatePostClient />;
+  return (
+    <div className="container py-8 pb-20">
+      <PostForm onSubmit={handleSubmit} isLoading={isPending} />
+    </div>
+  );
 }

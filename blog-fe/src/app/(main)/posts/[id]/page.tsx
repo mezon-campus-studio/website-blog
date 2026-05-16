@@ -138,7 +138,14 @@ export default function PostDetailPage() {
             />
 
             {/* Like / Comment / Report */}
-            <PostInteractions postId={post.id} postTitle={post.title} />
+            <PostInteractions 
+              postId={post.id} 
+              postTitle={post.title} 
+              initialLiked={post.isLiked}
+              initialBookmarked={post.isBookmarked}
+              initialLikeCount={post._count?.likes}
+              commentCount={post._count?.comments}
+            />
           </main>
         </div>
       </div>

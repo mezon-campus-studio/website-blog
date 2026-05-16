@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useComments, useAddComment, useDeleteComment } from '../hooks/usePostInteractions';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { Button } from '@/components/ui';
 import { MessageCircle, Trash2, Loader2, Send } from 'lucide-react';
 
 interface CommentSectionProps {
@@ -11,17 +10,19 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ postId }: CommentSectionProps) {
-  const { data: comments, isLoading } = useComments(postId);
+  const { data: commentData, isLoading } = useComments(postId);
   const { mutate: addComment, isPending: isAdding } = useAddComment(postId);
   const { mutate: deleteComment } = useDeleteComment(postId);
   const user = useAuthStore((s) => s.user);
 
   const [text, setText] = useState('');
 
+  const comments = commentData?.items || [];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim() || isAdding) return;
-    addComment(text.trim(), {
+    addComment({ content: text.trim() }, {
       onSuccess: () => setText(''),
     });
   };
@@ -33,7 +34,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
         <div className="w-px h-8 bg-card-border" />
         <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
           <MessageCircle size={16} className="text-primary" />
-          {isLoading ? '—' : (comments?.length ?? 0)} Comments
+          {isLoading ? '—' : (commentData?.total ?? 0)} Comments
         </h2>
       </div>
 
@@ -49,7 +50,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
               </div>
             </div>
           ))
-        ) : comments && comments.length > 0 ? (
+        ) : comments.length > 0 ? (
           comments.map((comment) => (
             <div
               key={comment.id}
@@ -71,10 +72,29 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground/90 leading-relaxed">{comment.content}</p>
+                
+                {/* Replies could be rendered here if supported in UI */}
+                {comment.replies && comment.replies.length > 0 && (
+                   <div className="mt-4 pl-4 border-l border-card-border space-y-4">
+                      {comment.replies.map(reply => (
+                        <div key={reply.id} className="flex gap-3">
+                           <div className="w-7 h-7 rounded-full bg-primary/5 flex items-center justify-center text-primary font-bold text-[10px] shrink-0 border border-primary/10">
+                              {reply.user?.name?.charAt(0) ?? '?'}
+                           </div>
+                           <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <span className="text-[11px] font-bold">{reply.user?.name ?? 'Anonymous'}</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground/80 leading-relaxed">{reply.content}</p>
+                           </div>
+                        </div>
+                      ))}
+                   </div>
+                )}
               </div>
 
-              {/* Delete (only own comments) */}
-              {user && (user.id === comment.userId || comment.userId === 'me') && (
+              {/* Delete (only own comments or admin) */}
+              {user && (user.id === comment.userId) && (
                 <button
                   onClick={() => deleteComment(comment.id)}
                   className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all p-1 self-start"

@@ -1,77 +1,90 @@
-import { useState, useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api-client';
-import { Comment } from '../types';
+import { 
+  Comment, 
+  CommentListResponse, 
+  LikeToggleResult, 
+  BookmarkToggleResult, 
+  SharePostResult, 
+  SharePlatform 
+} from '../types';
 
-// ─── LIKE (mock – swap endpoint khi BE xong) ───────────────────────────────
-export function useLikePost(postId: string, initialCount = 0) {
-  const [liked, setLiked] = useState(false);
-  const [count, setCount] = useState(initialCount);
+// ─── LIKE ──────────────────────────────────────────────────────────────────
+export function useLikePost(postId: string) {
+  const queryClient = useQueryClient();
 
-  const toggle = useCallback(() => {
-    setLiked((prev) => {
-      setCount((c) => (prev ? c - 1 : c + 1));
-      return !prev;
-    });
-    // TODO: replace with real API call when BE is ready
-    // apiClient.post(`/post/${postId}/like`)
-  }, [postId]);
-
-  return { liked, count, toggle };
+  return useMutation<LikeToggleResult, Error>({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<{ data: LikeToggleResult }>(`/post/${postId}/like`);
+      return data.data;
+    },
+    onSuccess: () => {
+      // Invalidate both the post detail and potentially lists
+      queryClient.invalidateQueries({ queryKey: ['posts', postId] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
 }
 
-// ─── COMMENTS (mock – swap endpoint khi BE xong) ──────────────────────────
-const MOCK_COMMENTS: Comment[] = [
-  {
-    id: 'mock-1',
-    postId: '',
-    userId: 'u1',
-    content: 'Great article! Really enjoyed reading this.',
-    user: { name: 'Alice' },
-    createdAt: new Date(Date.now() - 3600_000).toISOString(),
-  },
-  {
-    id: 'mock-2',
-    postId: '',
-    userId: 'u2',
-    content: 'Very insightful, thanks for sharing.',
-    user: { name: 'Bob' },
-    createdAt: new Date(Date.now() - 7200_000).toISOString(),
-  },
-];
+// ─── BOOKMARK ──────────────────────────────────────────────────────────────
+export function useBookmarkPost(postId: string) {
+  const queryClient = useQueryClient();
 
-export function useComments(postId: string) {
-  return useQuery<Comment[]>({
-    queryKey: ['comments', postId],
-    queryFn: async () => {
-      // TODO: replace with real API: GET /post/:postId/comments
-      await new Promise((r) => setTimeout(r, 300));
-      return MOCK_COMMENTS.map((c) => ({ ...c, postId }));
+  return useMutation<BookmarkToggleResult, Error>({
+    mutationFn: async () => {
+      const { data } = await apiClient.post<{ data: BookmarkToggleResult }>(`/post/${postId}/bookmark`);
+      return data.data;
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts', postId] });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+}
+
+// ─── SHARE ─────────────────────────────────────────────────────────────────
+export function useSharePost(postId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation<SharePostResult, Error, { platform?: SharePlatform }>({
+    mutationFn: async ({ platform }) => {
+      const { data } = await apiClient.post<{ data: SharePostResult }>(`/post/${postId}/share`, { platform });
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts', postId] });
+    },
+  });
+}
+
+// ─── COMMENTS ──────────────────────────────────────────────────────────────
+export function useComments(postId: string, page = 1, limit = 10) {
+  return useQuery<CommentListResponse, Error>({
+    queryKey: ['comments', postId, page, limit],
+    queryFn: async () => {
+      const { data } = await apiClient.get<{ data: CommentListResponse }>(`/post/${postId}/comments`, {
+        params: { page, limit },
+      });
+      return data.data;
+    },
+    enabled: !!postId,
   });
 }
 
 export function useAddComment(postId: string) {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (content: string): Promise<Comment> => {
-      // TODO: replace with real API: POST /post/:postId/comments
-      await new Promise((r) => setTimeout(r, 200));
-      return {
-        id: `mock-${Date.now()}`,
-        postId,
-        userId: 'me',
+  return useMutation<Comment, Error, { content: string; parentId?: string }>({
+    mutationFn: async ({ content, parentId }) => {
+      const { data } = await apiClient.post<{ data: Comment }>(`/post/${postId}/comments`, {
         content,
-        user: { name: 'You' },
-        createdAt: new Date().toISOString(),
-      };
+        parentId,
+      });
+      return data.data;
     },
-    onSuccess: (newComment) => {
-      queryClient.setQueryData<Comment[]>(['comments', postId], (old = []) => [
-        ...old,
-        newComment,
-      ]);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+      queryClient.invalidateQueries({ queryKey: ['posts', postId] });
     },
   });
 }
@@ -79,16 +92,13 @@ export function useAddComment(postId: string) {
 export function useDeleteComment(postId: string) {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<void, Error, string>({
     mutationFn: async (commentId: string) => {
-      // TODO: replace with real API: DELETE /comments/:id
-      await new Promise((r) => setTimeout(r, 200));
-      return commentId;
+      await apiClient.delete(`/post/${postId}/comments/${commentId}`);
     },
-    onSuccess: (commentId) => {
-      queryClient.setQueryData<Comment[]>(['comments', postId], (old = []) =>
-        old.filter((c) => c.id !== commentId)
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comments', postId] });
+      queryClient.invalidateQueries({ queryKey: ['posts', postId] });
     },
   });
 }
@@ -101,7 +111,7 @@ interface ReportPayload {
 
 export function useReportPost() {
   return useMutation({
-    mutationFn: async ({ postId, reason }: { postId: string; reason: string }) => {
+    mutationFn: async ({ postId, reason }: ReportPayload) => {
       console.log('📤 Sending Report:', { postId, reason });
       const { data } = await apiClient.post('/report/create', { postId, reason });
       return data;

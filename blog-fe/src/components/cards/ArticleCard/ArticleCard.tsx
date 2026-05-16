@@ -1,7 +1,10 @@
+"use client";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./ArticleCard.module.css";
 import { Post } from "@/features/posts/types";
+import { useUserProfile } from "@/features/auth/hooks/useUserProfile";
 
 interface ArticleCardProps {
   post: Post;
@@ -13,15 +16,21 @@ const stripHtml = (html: string) => {
 };
 
 export const ArticleCard = ({ post }: ArticleCardProps) => {
+  // Optimized: Use centralized hook with caching to handle missing user relation in BE
+  const { data: authorProfile } = useUserProfile(post?.userId || '');
+
   const fallbackImage = "https://images.unsplash.com/photo-1492724441997-5dc865305da7";
   const imageUrl = post.thumbnailUrl || fallbackImage;
   const categoryName = post.category?.name || "Uncategorized";
   
+  const authorName = post.user?.name || authorProfile?.name || "Unknown";
+  const authorAvatar = post.user?.avatar_url || authorProfile?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(authorName);
+
   const plainTextContent = stripHtml(post.content || "");
   const excerpt = plainTextContent.length > 120 
     ? plainTextContent.substring(0, 120) + "..."
     : plainTextContent;
-    
+
   const wordCount = plainTextContent.split(/\s+/).length;
   const readTime = Math.max(1, Math.ceil(wordCount / 200)) + " min read";
   
@@ -33,7 +42,7 @@ export const ArticleCard = ({ post }: ArticleCardProps) => {
 
   return (
     <Link href={`/posts/${post.id}`} className={styles.card}>
-      <article>
+      <article className="flex flex-col h-full">
         {/* Image */}
         <div className={styles.imageWrapper}>
           <Image
@@ -60,19 +69,21 @@ export const ArticleCard = ({ post }: ArticleCardProps) => {
 
           {/* Excerpt */}
           <p className={styles.excerpt}>{excerpt}</p>
+        </div>
 
-          {/* Author */}
+        {/* Author */}
+        <div className="px-6 pb-6 mt-auto">
           <div className={styles.author}>
             <div className={styles.avatarWrapper}>
               <Image 
-                src={post.user?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(post.user?.name || 'U')}
-                alt={post.user?.name || 'Author'}
+                src={authorAvatar}
+                alt={authorName}
                 width={24}
                 height={24}
                 className={styles.avatar}
               />
             </div>
-            <span className={styles.authorName}>{post.user?.name || 'Unknown'}</span>
+            <span className={styles.authorName}>{authorName}</span>
           </div>
         </div>
       </article>

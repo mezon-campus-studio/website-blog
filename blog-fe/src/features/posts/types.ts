@@ -7,25 +7,55 @@ export interface Post {
   categoryId: string;
   isDraft: boolean;
   userId: string;
-  category?: { name: string };
-  user?: { name: string; avatar_url?: string };
-  tags?: { tag: { name: string } }[];
+  category?: { id: string; name: string; slug: string };
+  user?: { id: string; name: string; avatar_url?: string };
+  tags?: { tag: { id: string; name: string } }[];
   createdAt: string;
   updatedAt: string;
+  _count?: {
+    likes: number;
+    comments: number;
+    bookmarks: number;
+    shares: number;
+  };
+  isLiked?: boolean;
+  isBookmarked?: boolean;
 }
 
 export interface Comment {
   id: string;
   postId: string;
   userId: string;
+  parentId: string | null;
   content: string;
-  user?: { name: string; avatar_url?: string };
+  user?: { id: string; name: string; avatar_url?: string };
   createdAt: string;
+  updatedAt?: string;
+  replies?: Comment[];
 }
 
-export interface Like {
-  postId: string;
-  userId: string;
+export interface LikeToggleResult {
+  liked: boolean;
+  likeCount: number;
+}
+
+export interface BookmarkToggleResult {
+  bookmarked: boolean;
+}
+
+export type SharePlatform = 'FACEBOOK' | 'TWITTER' | 'LINKEDIN' | 'COPY_LINK';
+
+export interface SharePostResult {
+  shared: boolean;
+  platform: SharePlatform | null;
+  shareCount: number;
+}
+
+export interface CommentListResponse {
+  items: Comment[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export type ReportStatus = 'PENDING' | 'RESOLVED' | 'REJECTED' | 'REVIEWED';
@@ -41,3 +71,4 @@ export interface Report {
   post?: { id: string; title: string; userId: string; user?: { name: string; email?: string } };
   user?: { id: string; name: string; email: string };
 }
+
