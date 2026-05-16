@@ -91,18 +91,21 @@ postRouter.get('/hot', asyncHandler(postController.getHotsPost.bind(postControll
 
 postRouter.post(
   '/:postId/like',
+  passportAuthenticateJwt,
   authorize('USER', 'ADMIN'),
   asyncHandler(postInteractionController.toggleLikePost.bind(postInteractionController)),
 );
 
 postRouter.post(
   '/:postId/bookmark',
+  passportAuthenticateJwt,
   authorize('USER', 'ADMIN'),
   asyncHandler(postInteractionController.toggleBookmarkPost.bind(postInteractionController)),
 );
 
 postRouter.post(
   '/:postId/share',
+  passportAuthenticateJwt,
   authorize('USER', 'ADMIN'),
   validateDto(SharePostDto),
   asyncHandler(postInteractionController.sharePost.bind(postInteractionController)),
@@ -115,12 +118,14 @@ postRouter.get(
 
 postRouter.post(
   '/:postId/comments',
+  passportAuthenticateJwt,
   validateDto(CreateCommentDto),
   asyncHandler(postInteractionController.createComment.bind(postInteractionController)),
 );
 
 postRouter.delete(
   '/:postId/comments/:commentId',
+  passportAuthenticateJwt,
   authorize('USER', 'ADMIN'),
   asyncHandler(postInteractionController.deleteComment.bind(postInteractionController)),
 );
