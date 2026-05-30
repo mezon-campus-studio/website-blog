@@ -6,12 +6,14 @@ import { NotificationItem } from '@/features/notifications/components/Notificati
 import { Button } from '@/components/ui';
 import { Bell, Check, Sparkles, Inbox } from 'lucide-react';
 import { useNotificationStore } from '@/features/notifications/store/notificationStore';
+import { useRouter } from 'next/navigation';
 
 export default function NotificationsPage() {
   const { isLoading } = useNotifications();
   const { notifications } = useNotificationStore();
   const { mutate: markRead } = useMarkAsRead();
   const { mutate: markAllRead } = useMarkAllAsRead();
+  const router = useRouter();
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -67,7 +69,15 @@ export default function NotificationsPage() {
               <NotificationItem 
                 key={notification.id} 
                 notification={notification} 
-                onClick={(id) => markRead(id)}
+                onClick={(id) => {
+                  markRead(id);
+                  if (notification.post?.id) {
+                    const targetUrl = notification.type === 'comment'
+                      ? `/posts/${notification.post.id}#comments`
+                      : `/posts/${notification.post.id}`;
+                    router.push(targetUrl);
+                  }
+                }}
               />
             ))}
           </div>

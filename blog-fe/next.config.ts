@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/memorizz-api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api'}/:path*`,
+        destination: `${process.env.BACKEND_API_URL || 'https://memorizz-api.onrender.com/api'}/:path*`,
       },
     ];
   },

@@ -16,6 +16,20 @@ const GithubIcon = ({ size = 24 }: { size?: number }) => (
   </svg>
 );
 
+const getOAuthUrl = (provider: string) => {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) return `/auth/${provider}`;
+  
+  if (apiUrl.startsWith('/')) {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}${apiUrl}/auth/${provider}`;
+    }
+    return `${apiUrl}/auth/${provider}`;
+  }
+  
+  return `${apiUrl}/auth/${provider}`;
+};
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -180,11 +194,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className={styles.socialButtons}>
-                  <Button variant="outline" className={styles.socialBtn} onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api'}/auth/google`}>
+                  <Button variant="outline" className={styles.socialBtn} onClick={() => window.location.href = getOAuthUrl('google')}>
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width={18} alt="Google" />
                     <span>Continue with Google</span>
                   </Button>
-                  <Button variant="outline" className={styles.socialBtn} onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api'}/auth/github`}>
+                  <Button variant="outline" className={styles.socialBtn} onClick={() => window.location.href = getOAuthUrl('github')}>
                     <GithubIcon size={18} />
                     <span>Continue with GitHub</span>
                   </Button>

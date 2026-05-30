@@ -3,6 +3,7 @@ import { NotificationItem } from './NotificationItem';
 import { useNotificationStore } from '../store/notificationStore';
 import { useMarkAllAsRead, useMarkAsRead } from '../hooks/useNotifications';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Check, BellOff, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui';
 
@@ -14,6 +15,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose })
   const { notifications, unreadCount } = useNotificationStore();
   const { mutate: markAllRead } = useMarkAllAsRead();
   const { mutate: markRead } = useMarkAsRead();
+  const router = useRouter();
 
   const handleMarkRead = (id: string) => {
     markRead(id);
@@ -42,7 +44,13 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose })
               notification={notification} 
               onClick={(id) => {
                 handleMarkRead(id);
-                // navigate logic could be here or inside NotificationItem
+                if (notification.post?.id) {
+                  const targetUrl = notification.type === 'comment'
+                    ? `/posts/${notification.post.id}#comments`
+                    : `/posts/${notification.post.id}`;
+                  router.push(targetUrl);
+                  onClose();
+                }
               }}
             />
           ))

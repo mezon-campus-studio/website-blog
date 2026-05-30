@@ -80,7 +80,20 @@ export default function SignUpPage() {
   };
 
   const handleSocialSignUp = (provider: string) => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api'}/auth/${provider.toLowerCase()}`;
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    let url = `/auth/${provider.toLowerCase()}`;
+    
+    if (apiUrl) {
+      if (apiUrl.startsWith('/')) {
+        url = typeof window !== 'undefined' 
+          ? `${window.location.origin}${apiUrl}/auth/${provider.toLowerCase()}` 
+          : `${apiUrl}/auth/${provider.toLowerCase()}`;
+      } else {
+        url = `${apiUrl}/auth/${provider.toLowerCase()}`;
+      }
+    }
+    
+    window.location.href = url;
   };
 
   return (

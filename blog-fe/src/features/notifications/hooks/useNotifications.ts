@@ -40,7 +40,7 @@ export function useMarkAsRead() {
       try {
         await apiClient.patch(`/notification/${id}/read`);
       } catch (err: any) {
-        console.warn(`⚠️ Backend markAsRead endpoint not available. Updating local state only.`, err.message);
+        // Silently catch and update local state since backend doesn't implement read endpoints
       }
     },
     onSuccess: (_, id) => {
@@ -59,7 +59,7 @@ export function useMarkAllAsRead() {
       try {
         await apiClient.patch('/notification/read-all');
       } catch (err: any) {
-        console.warn('⚠️ Backend markAllAsRead endpoint not available. Updating local state only.', err.message);
+        // Silently catch and update local state since backend doesn't implement read endpoints
       }
     },
     onSuccess: () => {
