@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '@/features/auth/store/authStore';
 
-const API_BASE_URL = '/memorizz-api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

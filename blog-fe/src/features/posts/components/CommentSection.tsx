@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useComments, useAddComment, useDeleteComment } from '../hooks/usePostInteractions';
 import { useAuthStore } from '@/features/auth/store/authStore';
-import { MessageCircle, Trash2, Loader2, Send } from 'lucide-react';
+import { MessageCircle, Trash2, Loader2, Send, Reply } from 'lucide-react';
 
 interface CommentSectionProps {
   postId: string;
@@ -16,14 +16,18 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const user = useAuthStore((s) => s.user);
 
   const [text, setText] = useState('');
+  const [replyingTo, setReplyingTo] = useState<{ id: string, name: string } | null>(null);
 
   const comments = commentData?.items || [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim() || isAdding) return;
-    addComment({ content: text.trim() }, {
-      onSuccess: () => setText(''),
+    addComment({ content: text.trim(), parentId: replyingTo?.id }, {
+      onSuccess: () => {
+        setText('');
+        setReplyingTo(null);
+      },
     });
   };
 
@@ -93,16 +97,27 @@ export function CommentSection({ postId }: CommentSectionProps) {
                 )}
               </div>
 
-              {/* Delete (only own comments or admin) */}
-              {user && (user.id === comment.userId) && (
-                <button
-                  onClick={() => deleteComment(comment.id)}
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-all p-1 self-start"
-                  title="Delete comment"
-                >
-                  <Trash2 size={14} />
-                </button>
-              )}
+              {/* Actions */}
+              <div className="flex flex-col gap-1 items-end self-start opacity-0 group-hover:opacity-100 transition-all">
+                {user && (
+                  <button
+                    onClick={() => setReplyingTo({ id: comment.id, name: comment.user?.name ?? 'Anonymous' })}
+                    className="text-muted-foreground hover:text-primary p-1"
+                    title="Reply"
+                  >
+                    <Reply size={14} />
+                  </button>
+                )}
+                {user && (user.id === comment.userId) && (
+                  <button
+                    onClick={() => deleteComment(comment.id)}
+                    className="text-muted-foreground hover:text-destructive p-1"
+                    title="Delete comment"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
             </div>
           ))
         ) : (
@@ -114,33 +129,41 @@ export function CommentSection({ postId }: CommentSectionProps) {
 
       {/* Comment Form */}
       {user ? (
-        <form onSubmit={handleSubmit} className="flex gap-3 items-end">
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 border border-primary/20">
-            {user.name.charAt(0)}
-          </div>
-          <div className="flex-1 relative">
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e as any);
-                }
-              }}
-              placeholder="Write a comment... (Enter to send)"
-              rows={2}
-              className="w-full bg-card-bg/50 border border-card-border rounded-2xl px-4 py-3 pr-14 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all resize-none"
-            />
-            <button
-              type="submit"
-              disabled={!text.trim() || isAdding}
-              className="absolute right-3 bottom-3 w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white hover:bg-primary-hover transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {isAdding ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-            </button>
-          </div>
-        </form>
+        <div className="flex flex-col gap-2">
+          {replyingTo && (
+            <div className="flex items-center justify-between text-xs text-muted-foreground ml-12 px-2 py-1 bg-primary/5 rounded-md border border-primary/10">
+              <span>Replying to <strong>{replyingTo.name}</strong></span>
+              <button onClick={() => setReplyingTo(null)} className="hover:text-primary font-bold">✕</button>
+            </div>
+          )}
+          <form onSubmit={handleSubmit} className="flex gap-3 items-end">
+            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0 border border-primary/20">
+              {user.name.charAt(0)}
+            </div>
+            <div className="flex-1 relative">
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e as any);
+                  }
+                }}
+                placeholder={replyingTo ? `Write a reply to ${replyingTo.name}... (Enter to send)` : "Write a comment... (Enter to send)"}
+                rows={2}
+                className="w-full bg-card-bg/50 border border-card-border rounded-2xl px-4 py-3 pr-14 text-sm focus:ring-2 focus:ring-primary/50 outline-none transition-all resize-none"
+              />
+              <button
+                type="submit"
+                disabled={!text.trim() || isAdding}
+                className="absolute right-3 bottom-3 w-8 h-8 rounded-xl bg-primary flex items-center justify-center text-white hover:bg-primary-hover transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {isAdding ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              </button>
+            </div>
+          </form>
+        </div>
       ) : (
         <div 
           onClick={() => window.location.href = '/signin'}

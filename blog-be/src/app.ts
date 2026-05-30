@@ -24,14 +24,21 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+app.use(cors({
+  origin: [Env.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:3001'].filter(Boolean) as string[],
+  credentials: true,
+}));
 
 app.use('/api', routes);
 
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+import { initSocket } from './websocket/socket';
+
+const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+initSocket(server);
 
 export default app;

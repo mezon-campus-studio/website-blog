@@ -1,9 +1,10 @@
 "use client";
 import type { FormEvent } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button, Input, Card, CardContent, ThemeToggle, Checkbox } from '@/components/ui';
 import { useLogin } from '@/features/auth/hooks';
 import styles from './LoginPage.module.css';
@@ -23,7 +24,15 @@ export default function LoginPage() {
   const [savedAccounts, setSavedAccounts] = useState<SavedAccount[]>([]);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { mutate: login, isPending, error: authError } = useLogin();
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      toast.error('Authentication failed. Please try again.');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const saved = localStorage.getItem('saved_accounts');
@@ -171,11 +180,11 @@ export default function LoginPage() {
                 </div>
 
                 <div className={styles.socialButtons}>
-                  <Button variant="outline" className={styles.socialBtn}>
+                  <Button variant="outline" className={styles.socialBtn} onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api'}/auth/google`}>
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width={18} alt="Google" />
                     <span>Continue with Google</span>
                   </Button>
-                  <Button variant="outline" className={styles.socialBtn}>
+                  <Button variant="outline" className={styles.socialBtn} onClick={() => window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api'}/auth/github`}>
                     <GithubIcon size={18} />
                     <span>Continue with GitHub</span>
                   </Button>

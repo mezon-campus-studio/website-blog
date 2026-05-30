@@ -1,4 +1,5 @@
-import { ROLE, SharePlatform } from '@prisma/client';
+import { NotificationType, ROLE, SharePlatform } from '@prisma/client';
+import { notificationWorker } from '../notification/notification.worker';
 import { BadRequestException, UnauthorizedException } from '@/common/utils/app-error';
 import {
   BookmarkToggleResult,
@@ -16,17 +17,39 @@ export class PostInteractionService {
   async getPostById(postId: string, userId: string): Promise<PostDetailResponse> {
     const post = await this.postInteractionRepository.findPostDetailById(postId, userId);
 
-    
-
     return post;
   }
 
   async toggleLikePost(userId: string, postId: string): Promise<LikeToggleResult> {
-    return await this.postInteractionRepository.toggleLikePost(userId, postId);
+    const result = await this.postInteractionRepository.toggleLikePost(userId, postId);
+
+    if (result.liked && result.authorId !== userId) {
+      await notificationWorker({
+        userId: userId,
+        targetId: result.authorId,
+        postId: postId,
+        type: NotificationType.LIKE,
+        message: `vừa thích bài viết của bạn: ${result.postTitle}`,
+      });
+    }
+
+    return result;
   }
 
   async toggleBookmarkPost(userId: string, postId: string): Promise<BookmarkToggleResult> {
-    return await this.postInteractionRepository.toggleBookmarkPost(userId, postId);
+    const result = await this.postInteractionRepository.toggleBookmarkPost(userId, postId);
+
+    if (result.bookmarked && result.authorId !== userId) {
+      await notificationWorker({
+        userId: userId,
+        targetId: result.authorId,
+        postId: postId,
+        type: NotificationType.BOOKMARK,
+        message: `vừa lưu bài viết của bạn: ${result.postTitle}`,
+      });
+    }
+
+    return result;
   }
 
   async sharePost(
@@ -35,12 +58,24 @@ export class PostInteractionService {
     platform?: SharePlatform,
   ): Promise<SharePostResult> {
     const sharePlatform = platform ?? SharePlatform.COPY_LINK;
-    const share = await this.postInteractionRepository.sharePost(userId, postId, sharePlatform);
+    const result = await this.postInteractionRepository.sharePost(userId, postId, sharePlatform);
+
+    if (result.authorId !== userId) {
+      await notificationWorker({
+        userId: userId,
+        targetId: result.authorId,
+        postId: postId,
+        type: NotificationType.SHARE,
+        message: `vừa chia sẻ bài viết của bạn: ${result.postTitle}`,
+      });
+    }
 
     return {
       shared: true,
-      platform: share.platform,
-      shareCount: share.shareCount,
+      platform: result.platform,
+      shareCount: result.shareCount,
+      authorId: result.authorId,
+      postTitle: result.postTitle,
     };
   }
 
@@ -56,12 +91,24 @@ export class PostInteractionService {
       throw new BadRequestException('Comment content is required');
     }
 
-    return await this.postInteractionRepository.createComment(
+    const result = await this.postInteractionRepository.createComment(
       userId,
       postId,
       normalizedContent,
       parentId,
     );
+
+    if (result.authorId && result.authorId !== userId) {
+      await notificationWorker({
+        userId: userId,
+        targetId: result.authorId,
+        postId: postId,
+        type: NotificationType.COMMENT,
+        message: `vừa bình luận về bài viết của bạn: ${result.postTitle}`,
+      });
+    }
+
+    return result;
   }
 
   async getCommentsByPostId(
@@ -75,9 +122,7 @@ export class PostInteractionService {
   async deleteComment(userId: string, role: ROLE, commentId: string): Promise<void> {
     const comment = await this.postInteractionRepository.findCommentById(commentId);
 
-
-
     await this.postInteractionRepository.deleteComment(userId, commentId);
-    return
+    return;
   }
 }

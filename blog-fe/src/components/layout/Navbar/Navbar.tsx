@@ -7,8 +7,10 @@ import styles from "./Navbar.module.css";
 import { Button, SearchInput } from "@/components/ui";
 import { useDarkMode } from "@/hooks/useDarkMode";
 import { useAuth, useLogout } from "@/features/auth/hooks";
-import { LogOut, User as UserIcon, LayoutDashboard } from "lucide-react";
+import { LogOut, User as UserIcon, LayoutDashboard, BookOpen } from "lucide-react";
 import RoleGate from "@/components/auth/RoleGate";
+
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useDarkMode();
@@ -101,6 +103,15 @@ export const Navbar = () => {
 
           {user ? (
             <div className="flex items-center gap-4">
+              <NotificationBell />
+              <Link
+                href={`/users/${user.id}`}
+                className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 hover:bg-primary/20 hover:scale-105 px-3 py-1.5 rounded-full transition-all"
+                title="My Wall / Profile"
+              >
+                <BookOpen size={12} />
+                <span>My Wall</span>
+              </Link>
               <Link href="/profile" className="flex items-center gap-2 text-sm font-medium hover:text-primary transition-colors">
                 <UserIcon size={18} />
                 <span>{user.name}</span>

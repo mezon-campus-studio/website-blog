@@ -47,16 +47,22 @@ export type PostDetailResponse = {
 export type LikeToggleResult = {
   liked: boolean;
   likeCount: number;
+  authorId: string;
+  postTitle: string;
 };
 
 export type BookmarkToggleResult = {
   bookmarked: boolean;
+  authorId: string;
+  postTitle: string;
 };
 
 export type SharePostResult = {
   shared: boolean;
   platform: string | null;
   shareCount: number;
+  authorId: string;
+  postTitle: string;
 };
 
 export type CommentAuthor = PostAuthor;
@@ -71,6 +77,8 @@ export type CommentNode = {
   updatedAt: Date;
   user: CommentAuthor;
   replies: CommentNode[];
+  authorId?: string;
+  postTitle?: string;
 };
 
 export type CommentListResponse = {

@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import { InternalServerException, UnauthorizedException } from '@/common/utils/app-error';
-import { IAuthRepository } from './auth.repository';
+import { IAuthRepository, OAuthUserData } from './auth.repository';
 import { SignInDto, SignUpDto } from './auth.dto';
 
 export class AuthService {
@@ -39,17 +39,25 @@ export class AuthService {
       const { email, password } = body;
       const user = await this.authRepository.findUserByEmail(email);
 
-      if (!user || !(await bcrypt.compare(password, user.password))) {
+      if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
         throw new UnauthorizedException('Invalid email or password');
       }
 
       return await this.authRepository.updateLastLogin(user.id, new Date());
     } catch (error) {
       if (error instanceof UnauthorizedException) {
-        
+        throw error;
       }
 
       throw new InternalServerException('Failed to login');
+    }
+  }
+
+  async oauthLogin(data: OAuthUserData) {
+    try {
+      return await this.authRepository.findOrCreateOAuthUser(data);
+    } catch (error) {
+      throw new InternalServerException('Failed to login with OAuth');
     }
   }
 }

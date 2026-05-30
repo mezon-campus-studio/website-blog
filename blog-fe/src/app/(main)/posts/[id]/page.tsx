@@ -145,6 +145,7 @@ export default function PostDetailPage() {
               initialBookmarked={post.isBookmarked}
               initialLikeCount={post._count?.likes}
               commentCount={post._count?.comments}
+              post={post}
             />
           </main>
         </div>

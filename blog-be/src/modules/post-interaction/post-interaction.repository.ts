@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client/extension';
-import { Category, Post, PostShare, SharePlatform } from '@prisma/client';
+import { Category, InteractionType, Post, PostShare, SharePlatform } from '@prisma/client';
 import { NotFoundException } from '@/common/utils/app-error';
 import {
   BookmarkToggleResult,
@@ -26,7 +26,7 @@ type CommentRecord = {
 };
 
 export class PrismaPostInteractionRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(private readonly prisma: PrismaClient) { }
 
   async findPostDetailById(postId: string, userId: string): Promise<PostDetailResponse> {
     const post = await this.prisma.post.findUnique({
@@ -137,6 +137,8 @@ export class PrismaPostInteractionRepository {
       select: {
         id: true,
         likeCount: true,
+        userId: true,
+        title: true,
       },
     });
 
@@ -172,9 +174,23 @@ export class PrismaPostInteractionRepository {
             updatedBy: userId,
           },
         }),
+        this.prisma.userInteraction.delete({
+          where: {
+            userId_postId_type: {
+              userId,
+              postId,
+              type: InteractionType.LIKE,
+            },
+          },
+        }),
       ]);
 
-      return { liked: false, likeCount: Math.max(post.likeCount - 1, 0) };
+      return {
+        liked: false,
+        likeCount: Math.max(post.likeCount - 1, 0),
+        authorId: post.userId,
+        postTitle: post.title,
+      };
     }
 
     await this.prisma.$transaction([
@@ -195,9 +211,35 @@ export class PrismaPostInteractionRepository {
           updatedBy: userId,
         },
       }),
+      this.prisma.userInteraction.upsert({
+        where: {
+          userId_postId_type: {
+            userId,
+            postId,
+            type: InteractionType.LIKE,
+          },
+        },
+        create: {
+          userId,
+          postId,
+          type: InteractionType.LIKE,
+          createdBy: userId,
+          updatedBy: userId,
+        },
+        update: {
+          isDeleted: false,
+          isActive: true,
+          updatedBy: userId,
+        },
+      }),
     ]);
 
-    return { liked: true, likeCount: post.likeCount + 1 };
+    return {
+      liked: true,
+      likeCount: post.likeCount + 1,
+      authorId: post.userId,
+      postTitle: post.title,
+    };
   }
 
   async toggleBookmarkPost(userId: string, postId: string): Promise<BookmarkToggleResult> {
@@ -207,7 +249,7 @@ export class PrismaPostInteractionRepository {
         isDeleted: false,
         isActive: true,
       },
-      select: { id: true },
+      select: { id: true, userId: true, title: true },
     });
 
     if (!post) {
@@ -224,57 +266,127 @@ export class PrismaPostInteractionRepository {
     });
 
     if (existingBookmark) {
-      await this.prisma.postBookmark.delete({
-        where: {
-          postId_userId: {
-            postId,
-            userId,
+      await this.prisma.$transaction([
+        this.prisma.postBookmark.update({
+          where: {
+            postId_userId: {
+              postId,
+              userId,
+            },
           },
-        },
-      });
+          data: {
+            isDeleted: true,
+            isActive: false,
+            updatedBy: userId,
+          },
+        }),
+        this.prisma.userInteraction.delete({
+          where: {
+            userId_postId_type: {
+              userId,
+              postId,
+              type: InteractionType.BOOKMARK,
+            },
+          },
+        }),
+      ]);
 
-      return { bookmarked: false };
+      return {
+        bookmarked: false,
+        authorId: post.userId,
+        postTitle: post.title,
+      };
     }
 
-    await this.prisma.postBookmark.create({
-      data: {
-        postId,
-        userId,
-        createdBy: userId,
-        updatedBy: userId,
-      },
-    });
+    await this.prisma.$transaction([
+      this.prisma.postBookmark.create({
+        data: {
+          postId,
+          userId,
+          createdBy: userId,
+          updatedBy: userId,
+        },
+      }),
+      this.prisma.userInteraction.upsert({
+        where: {
+          userId_postId_type: {
+            userId,
+            postId,
+            type: InteractionType.BOOKMARK,
+          },
+        },
+        create: {
+          userId,
+          postId,
+          type: InteractionType.BOOKMARK,
+          createdBy: userId,
+          updatedBy: userId,
+        },
+        update: {
+          isDeleted: false,
+          isActive: true,
+          updatedBy: userId,
+        },
+      }),
+    ]);
 
-    return { bookmarked: true };
+    return {
+      bookmarked: true,
+      authorId: post.userId,
+      postTitle: post.title,
+    };
   }
 
   async sharePost(
     userId: string,
     postId: string,
     platform: SharePlatform,
-  ): Promise<PostShare & { shareCount: number }> {
+  ): Promise<PostShare & { shareCount: number; authorId: string; postTitle: string }> {
     const post = await this.prisma.post.findUnique({
       where: {
         id: postId,
 
         isActive: true,
       },
-      select: { id: true },
+      select: { id: true, userId: true, title: true },
     });
 
     if (!post) {
       throw new NotFoundException('Post not found');
     }
 
-    const share = await this.prisma.postShare.create({
-      data: {
-        postId,
-        userId,
-        platform,
-        createdBy: userId,
-        updatedBy: userId,
-      },
-    });
+    const [share] = await this.prisma.$transaction([
+      this.prisma.postShare.create({
+        data: {
+          postId,
+          userId,
+          platform,
+          createdBy: userId,
+          updatedBy: userId,
+        },
+      }),
+      this.prisma.userInteraction.upsert({
+        where: {
+          userId_postId_type: {
+            userId,
+            postId,
+            type: InteractionType.SHARE,
+          },
+        },
+        create: {
+          userId,
+          postId,
+          type: InteractionType.SHARE,
+          createdBy: userId,
+          updatedBy: userId,
+        },
+        update: {
+          isDeleted: false,
+          isActive: true,
+          updatedBy: userId,
+        },
+      }),
+    ]);
 
     const shareCount = await this.prisma.postShare.count({
       where: {
@@ -284,7 +396,12 @@ export class PrismaPostInteractionRepository {
       },
     });
 
-    return { ...share, shareCount };
+    return {
+      ...share,
+      shareCount,
+      authorId: post.userId,
+      postTitle: post.title,
+    };
   }
 
   async createComment(
@@ -299,7 +416,7 @@ export class PrismaPostInteractionRepository {
         isDeleted: false,
         isActive: true,
       },
-      select: { id: true },
+      select: { id: true, userId: true, title: true },
     });
 
     if (!post) {
@@ -320,27 +437,57 @@ export class PrismaPostInteractionRepository {
       }
     }
 
-    const comment = await this.prisma.postComment.create({
-      data: {
-        postId,
-        userId,
-        parentId: parentId ?? null,
-        content,
-        createdBy: userId,
-        updatedBy: userId,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            avatar_url: true,
+    const [comment] = await this.prisma.$transaction([
+      this.prisma.postComment.create({
+        data: {
+          postId,
+          userId,
+          parentId: parentId ?? null,
+          content,
+          createdBy: userId,
+          updatedBy: userId,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              avatar_url: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.userInteraction.upsert({
+        where: {
+          userId_postId_type: {
+            userId,
+            postId,
+            type: InteractionType.COMMENT,
+          },
+        },
+        create: {
+          userId,
+          postId,
+          type: InteractionType.COMMENT,
+          targetId: parentId,
+          createdBy: userId,
+          updatedBy: userId,
+        },
+        update: {
+          targetId: parentId,
+          isDeleted: false,
+          isActive: true,
+          updatedBy: userId,
+        },
+      }),
+    ]);
 
-    return { ...comment, replies: [] };
+    return {
+      ...comment,
+      replies: [],
+      authorId: post.userId,
+      postTitle: post.title,
+    };
   }
 
   async getCommentsByPostId(

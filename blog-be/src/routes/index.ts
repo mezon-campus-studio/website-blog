@@ -7,6 +7,7 @@ import categoryRoutes from './category.route';
 import tagRoutes from './tag.route';
 import adminRouter from './admin.route';
 import reportRouter from './report.route';
+import notificationRouter from './notification.route';
 
 const router = Router();
 router.use('/auth', authRoutes);
@@ -17,5 +18,6 @@ router.use('/category', categoryRoutes);
 router.use('/tag', tagRoutes);
 router.use('/admin', adminRouter);
 router.use('/report', reportRouter);
+router.use('/notification', notificationRouter);
 
 export default router;

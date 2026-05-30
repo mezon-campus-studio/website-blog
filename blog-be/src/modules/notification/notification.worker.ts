@@ -16,13 +16,13 @@ export const notificationWorker = async (
   try {
     const notification = await prisma.notification.create({
       data: {
-        userId: payload.userId,
-        targetId: payload.targetId,
+        userId: payload.targetId, // Recipient
+        targetId: payload.userId, // Actor
         postId: payload.postId,
         type: payload.type,
         message: payload.message,
-        createdBy: payload.userId,
-        updatedBy: payload.userId,
+        createdBy: payload.userId, // Actor
+        updatedBy: payload.userId, // Actor
       },
     });
 

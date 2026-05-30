@@ -80,7 +80,7 @@ export default function SignUpPage() {
   };
 
   const handleSocialSignUp = (provider: string) => {
-    console.log(`Sign up with ${provider}`);
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'https://memorizz-api.onrender.com/api'}/auth/${provider.toLowerCase()}`;
   };
 
   return (

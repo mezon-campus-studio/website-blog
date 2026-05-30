@@ -10,16 +10,20 @@ export function useNotifications() {
   const query = useQuery<Notification[], Error>({
     queryKey: ['notifications'],
     queryFn: async () => {
-      // Temporarily disabled as the backend lacks this endpoint
-      // const { data } = await apiClient.get<{ data: Notification[] }>('/notifications');
-      // return data.data || [];
-      return [];
+      try {
+        const { data } = await apiClient.get<{ data: Notification[] }>('/notification/user');
+        return data.data || [];
+      } catch (err: any) {
+        console.warn('⚠️ Backend notifications endpoint not available. Using local store notifications.', err.message);
+        // Do not throw; return whatever is currently in our in-memory Zustand store
+        return useNotificationStore.getState().notifications;
+      }
     },
   });
 
   // Sync with store when data changes
   useEffect(() => {
-    if (query.data) {
+    if (query.data && query.data.length > 0) {
       setNotifications(query.data);
     }
   }, [query.data, setNotifications]);
@@ -33,7 +37,11 @@ export function useMarkAsRead() {
 
   return useMutation<void, Error, string>({
     mutationFn: async (id) => {
-      await apiClient.patch(`/notifications/${id}/read`);
+      try {
+        await apiClient.patch(`/notification/${id}/read`);
+      } catch (err: any) {
+        console.warn(`⚠️ Backend markAsRead endpoint not available. Updating local state only.`, err.message);
+      }
     },
     onSuccess: (_, id) => {
       markAsRead(id);
@@ -48,7 +56,11 @@ export function useMarkAllAsRead() {
 
   return useMutation<void, Error, void>({
     mutationFn: async () => {
-      await apiClient.patch('/notifications/read-all');
+      try {
+        await apiClient.patch('/notification/read-all');
+      } catch (err: any) {
+        console.warn('⚠️ Backend markAllAsRead endpoint not available. Updating local state only.', err.message);
+      }
     },
     onSuccess: () => {
       markAllAsRead();

@@ -20,7 +20,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose })
   };
 
   return (
-    <div className="absolute right-0 mt-2 w-80 md:w-96 bg-card border rounded-lg shadow-xl overflow-hidden z-50 animate-in fade-in zoom-in duration-200 origin-top-right">
+    <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white dark:bg-card border rounded-lg shadow-xl overflow-hidden z-50 animate-in fade-in zoom-in duration-200 origin-top-right">
       <div className="flex items-center justify-between p-4 border-b bg-muted/30">
         <h3 className="font-bold text-lg">Notifications</h3>
         {unreadCount > 0 && (
@@ -56,7 +56,7 @@ export const NotificationPanel: React.FC<NotificationPanelProps> = ({ onClose })
 
       <div className="p-2 border-t bg-muted/10">
         <Link href="/notifications" onClick={onClose}>
-          <Button variant="outline" className="w-full text-xs h-9 gap-2">
+          <Button variant="outline" className="w-full text-xs h-9 gap-2 bg-black text-white hover:bg-zinc-800 hover:text-white border-transparent dark:bg-white dark:text-black dark:hover:bg-zinc-200">
             View all notifications
             <ArrowRight size={14} />
           </Button>

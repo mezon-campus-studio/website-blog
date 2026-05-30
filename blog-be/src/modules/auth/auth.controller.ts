@@ -3,6 +3,7 @@ import { clearJwtAuthCookie, setJwtAuthCookie } from '@/common/utils/cookie';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { SignInDto, SignUpDto } from './auth.dto';
+import { Env } from '@/config/env.config';
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -50,5 +51,21 @@ export class AuthController {
       message: 'User authenticated successfully',
       user,
     });
+  }
+
+  async oauthCallback(req: Request, res: Response) {
+    const user = req.user as { id: string };
+
+    if (!user) {
+      return res.redirect(`${Env.FRONTEND_URL}/signin?error=oauth_failed`);
+    }
+
+    const accessToken = setJwtAuthCookie({
+      res,
+      userId: user.id,
+    });
+
+    // Redirect to frontend with token
+    return res.redirect(`${Env.FRONTEND_URL}/oauth/callback?token=${accessToken}`);
   }
 }
